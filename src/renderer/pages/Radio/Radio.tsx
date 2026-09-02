@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Radio as RadioIcon } from 'lucide-react';
 import type { Radio } from '@/shared/types';
 import { RadioCard } from '@/renderer/components/RadioCard/RadioCard';
+import { matchesArabic } from '@/renderer/utils/search';
 
 interface RadioPageProps {
   radios: Radio[];
@@ -11,8 +12,7 @@ interface RadioPageProps {
 export const RadioPage: React.FC<RadioPageProps> = ({ radios, searchQuery }) => {
   const filteredRadios = useMemo(() => {
     if (!searchQuery.trim()) return radios;
-    const query = searchQuery.trim().toLowerCase();
-    return radios.filter((r) => r.name.toLowerCase().includes(query));
+    return radios.filter((r) => matchesArabic(r.name, searchQuery));
   }, [radios, searchQuery]);
 
   return (

@@ -16,6 +16,7 @@ import { Reciters } from './pages/Reciters/Reciters';
 import { RadioPage } from './pages/Radio/Radio';
 import { Favorites } from './pages/Favorites/Favorites';
 import { Settings } from './pages/Settings/Settings';
+import { SearchResults } from './pages/SearchResults/SearchResults';
 import { Skeleton } from './components/Skeleton/Skeleton';
 
 export const App: React.FC = () => {
@@ -152,6 +153,17 @@ export const App: React.FC = () => {
                 <Skeleton className="h-40 rounded-2xl" />
               </div>
             </div>
+          ) : searchQuery.trim() ? (
+            <SearchResults
+              query={searchQuery}
+              surahs={surahs}
+              reciters={reciters}
+              radios={radios}
+              onClearSearch={() => setSearchQuery('')}
+              onPlaySurahDirect={handlePlaySurahDirect}
+              onSelectReciter={setSelectedReciter}
+              onOpenReciterPicker={setSelectedSurahForReciter}
+            />
           ) : (
             <>
               {currentPage === 'home' && (

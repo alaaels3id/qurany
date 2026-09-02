@@ -153,6 +153,7 @@ export interface ElectronAPI {
     maximizeWindow: () => Promise<void>;
     closeWindow: () => Promise<void>;
     isMaximized: () => Promise<boolean>;
+    toggleFullscreen: () => Promise<boolean>;
   };
   tray: {
     updateTrackInfo: (title: string, subtitle?: string, isPlaying?: boolean) => Promise<void>;

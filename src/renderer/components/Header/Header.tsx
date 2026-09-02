@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, Sun, Moon, Minimize2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Sun, Moon, Maximize2, Minimize2 } from 'lucide-react';
 import { useSettingsStore } from '@/renderer/store/useSettingsStore';
 import type { PageId } from '../Sidebar/Sidebar';
 
@@ -15,6 +15,17 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
 }) => {
   const { theme, setTheme } = useSettingsStore();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   const titles: Record<PageId, { title: string; desc: string }> = {
     home: { title: 'الرئيسية', desc: 'مرحباً بك في تطبيق قرآني لسطح المكتب' },
@@ -31,9 +42,21 @@ export const Header: React.FC<HeaderProps> = ({
     else setTheme('dark');
   };
 
-  const handleMinimizeToTray = () => {
-    if (window.electronAPI) {
-      window.electronAPI.app.minimizeToTray();
+  const handleToggleFullscreen = async () => {
+    if (window.electronAPI?.app?.toggleFullscreen) {
+      try {
+        const isFS = await window.electronAPI.app.toggleFullscreen();
+        setIsFullscreen(isFS);
+        return;
+      } catch (e) {
+        console.error('Electron fullscreen error:', e);
+      }
+    }
+
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
     }
   };
 
@@ -42,9 +65,13 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Title & Subtitle */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-cairo flex items-center gap-2">
-          {titles[currentPage].title}
+          {searchQuery.trim() ? 'نتائج البحث' : titles[currentPage].title}
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{titles[currentPage].desc}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          {searchQuery.trim()
+            ? 'البحث الشامل في السور والقراء والمحطات الإذاعية'
+            : titles[currentPage].desc}
+        </p>
       </div>
 
       {/* Center Search Bar */}
@@ -84,15 +111,20 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </button>
 
-        {/* Minimize to Tray */}
+        {/* Fullscreen Toggle Button */}
         <button
-          onClick={handleMinimizeToTray}
-          title="تصغير إلى شريط المهام (Tray)"
+          onClick={handleToggleFullscreen}
+          title={isFullscreen ? 'إنهاء ملء الشاشة' : 'ملء الشاشة'}
           className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all"
         >
-          <Minimize2 className="w-4 h-4" />
+          {isFullscreen ? (
+            <Minimize2 className="w-4 h-4" />
+          ) : (
+            <Maximize2 className="w-4 h-4" />
+          )}
         </button>
       </div>
     </header>
   );
 };
+

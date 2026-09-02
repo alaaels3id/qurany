@@ -9,6 +9,7 @@ const electronAPI: ElectronAPI = {
     maximizeWindow: () => ipcRenderer.invoke('app:maximizeWindow'),
     closeWindow: () => ipcRenderer.invoke('app:closeWindow'),
     isMaximized: () => ipcRenderer.invoke('app:isMaximized'),
+    toggleFullscreen: () => ipcRenderer.invoke('app:toggleFullscreen'),
   },
   tray: {
     updateTrackInfo: (title: string, subtitle?: string, isPlaying?: boolean) =>

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { LayoutGrid, List, Sparkles, Filter } from 'lucide-react';
 import type { Surah } from '@/shared/types';
 import { SurahCard } from '@/renderer/components/SurahCard/SurahCard';
+import { matchesArabic } from '@/renderer/utils/search';
 
 interface SurahsProps {
   surahs: Surah[];
@@ -28,9 +29,9 @@ export const Surahs: React.FC<SurahsProps> = ({
       // Search Query
       if (searchQuery.trim()) {
         const query = searchQuery.trim().toLowerCase();
-        const matchesName = s.name.includes(query);
+        const matchesName = matchesArabic(s.name, query);
         const matchesEn = s.name_en?.toLowerCase().includes(query) || (s as any).englishName?.toLowerCase().includes(query);
-        const matchesId = String(s.id).includes(query);
+        const matchesId = String(s.id) === query || String(s.id).includes(query);
         if (!matchesName && !matchesEn && !matchesId) return false;
       }
 

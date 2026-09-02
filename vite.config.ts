@@ -30,8 +30,16 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron/preload',
             sourcemap: true,
+            lib: {
+              entry: 'src/preload/preload.ts',
+              formats: ['cjs'],
+              fileName: () => 'preload.cjs',
+            },
             rollupOptions: {
               external: ['electron'],
+              output: {
+                format: 'cjs',
+              },
             },
           },
         },

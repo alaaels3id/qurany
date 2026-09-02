@@ -33,7 +33,7 @@ function createWindow() {
     frame: true, // Clean native frame with title
     titleBarStyle: 'default',
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, '../preload/preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false, // required for secure contextBridge + ipcRenderer

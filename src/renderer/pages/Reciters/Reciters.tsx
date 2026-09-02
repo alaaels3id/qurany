@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Mic2, Filter } from 'lucide-react';
 import type { Reciter, Riwayah } from '@/shared/types';
 import { ReciterCard } from '@/renderer/components/ReciterCard/ReciterCard';
+import { matchesArabic } from '@/renderer/utils/search';
 
 interface RecitersProps {
   reciters: Reciter[];
@@ -43,8 +44,7 @@ export const Reciters: React.FC<RecitersProps> = ({
 
       // Search Query
       if (searchQuery.trim()) {
-        const query = searchQuery.trim().toLowerCase();
-        if (!r.name.toLowerCase().includes(query)) return false;
+        if (!matchesArabic(r.name, searchQuery)) return false;
       }
 
       return true;

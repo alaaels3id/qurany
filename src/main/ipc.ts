@@ -34,6 +34,12 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
     return mainWindow.isMaximized();
   });
 
+  ipcMain.handle('app:toggleFullscreen', () => {
+    const isFS = !mainWindow.isFullScreen();
+    mainWindow.setFullScreen(isFS);
+    return isFS;
+  });
+
   // System Tray Updates
   ipcMain.handle(
     'tray:updateTrackInfo',
