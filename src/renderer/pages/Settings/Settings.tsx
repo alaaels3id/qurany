@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sun,
   Moon,
@@ -8,10 +8,16 @@ import {
   Info,
   Sparkles,
   Volume2,
+  RefreshCw,
+  DownloadCloud,
+  CheckCircle2,
+  AlertCircle,
+  ArrowUpCircle,
 } from 'lucide-react';
 import { useSettingsStore } from '@/renderer/store/useSettingsStore';
 import { useHistoryStore } from '@/renderer/store/useHistoryStore';
 import { Mp3QuranApi } from '@/renderer/services/mp3quran/api';
+import type { UpdateStatusPayload } from '@/shared/types';
 
 export const Settings: React.FC = () => {
   const {
@@ -26,6 +32,65 @@ export const Settings: React.FC = () => {
   } = useSettingsStore();
 
   const { clearHistory } = useHistoryStore();
+
+  // Auto Updater State
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatusPayload>({
+    status: 'idle',
+    currentVersion: '1.1.0',
+  });
+  const [isChecking, setIsChecking] = useState(false);
+
+  useEffect(() => {
+    if (window.electronAPI?.updater) {
+      window.electronAPI.updater.getStatus().then((status) => {
+        if (status) setUpdateStatus(status);
+      }).catch(console.error);
+
+      const cleanup = window.electronAPI.updater.onStatusChange((status) => {
+        setUpdateStatus(status);
+        if (status.status !== 'checking') {
+          setIsChecking(false);
+        }
+      });
+      return cleanup;
+    }
+  }, []);
+
+  const handleCheckForUpdates = async () => {
+    setIsChecking(true);
+    if (window.electronAPI?.updater) {
+      try {
+        await window.electronAPI.updater.check();
+      } catch (e) {
+        console.error(e);
+        setIsChecking(false);
+      }
+    } else {
+      setTimeout(() => {
+        setIsChecking(false);
+        setUpdateStatus((prev) => ({
+          ...prev,
+          status: 'not-available',
+        }));
+      }, 1000);
+    }
+  };
+
+  const handleDownloadUpdate = async () => {
+    if (window.electronAPI?.updater) {
+      try {
+        await window.electronAPI.updater.download();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  const handleInstallUpdate = () => {
+    if (window.electronAPI?.updater) {
+      window.electronAPI.updater.install();
+    }
+  };
 
   const handleClearCache = () => {
     Mp3QuranApi.clearCache();
@@ -246,12 +311,137 @@ export const Settings: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. App Info */}
+      {/* 5. Software Updates */}
+      <div className="p-6 rounded-3xl glass-panel space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/15 border border-brand-500/20 flex items-center justify-center text-brand-500 dark:text-brand-400">
+              <RefreshCw className={`w-5 h-5 ${isChecking ? 'animate-spin' : ''}`} />
+            </div>
+            <div>
+              <h3 className="font-bold text-base text-slate-800 dark:text-slate-100 font-cairo">
+                تحديثات التطبيق (Auto Updater)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                التحقق من أحدث الإصدارات وتنزيل التحديثات تلقائياً عبر GitHub
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleCheckForUpdates}
+            disabled={isChecking || updateStatus.status === 'downloading'}
+            className="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-md shadow-brand-500/20"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
+            <span>{isChecking ? 'جاري التحقق...' : 'التحقق من وجود تحديثات'}</span>
+          </button>
+        </div>
+
+        {/* Current Version & Status Display */}
+        <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-white/5 border border-slate-200/70 dark:border-white/5 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">الإصدار المثبت:</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-200/80 dark:bg-white/10 text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
+                v{updateStatus.currentVersion}
+              </span>
+            </div>
+
+            {/* Status Feedback */}
+            {updateStatus.status === 'not-available' && (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>أنت تستخدم أحدث إصدار متوفر</span>
+              </div>
+            )}
+
+            {updateStatus.status === 'checking' && (
+              <div className="flex items-center gap-1.5 text-xs text-brand-600 dark:text-brand-400 font-medium animate-pulse">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>جاري الاتصال بخادم التحديثات...</span>
+              </div>
+            )}
+
+            {updateStatus.status === 'error' && (
+              <div className="flex items-center gap-1.5 text-xs text-rose-500 font-medium">
+                <AlertCircle className="w-4 h-4" />
+                <span>{updateStatus.error || 'تعذر التحقق من التحديثات'}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Update Available Banner */}
+          {updateStatus.status === 'available' && (
+            <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-500/30 flex flex-wrap items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-brand-700 dark:text-brand-400 font-bold text-sm">
+                  <ArrowUpCircle className="w-4 h-4" />
+                  <span>يتوفر إصدار جديد: v{updateStatus.updateInfo?.version}</span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  يتضمن هذا التحديث تحسينات في الأداء ومزايا جديدة.
+                </p>
+              </div>
+
+              <button
+                onClick={handleDownloadUpdate}
+                className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-brand-500/20 transition-all"
+              >
+                <DownloadCloud className="w-4 h-4" />
+                <span>تحميل التحديث الآن</span>
+              </button>
+            </div>
+          )}
+
+          {/* Downloading Progress Bar */}
+          {updateStatus.status === 'downloading' && updateStatus.progress && (
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                <span>جاري تحميل التحديث... ({updateStatus.progress.percent}%)</span>
+                <span>
+                  {(updateStatus.progress.transferred / 1024 / 1024).toFixed(1)} MB من{' '}
+                  {(updateStatus.progress.total / 1024 / 1024).toFixed(1)} MB ({' '}
+                  {(updateStatus.progress.bytesPerSecond / 1024 / 1024).toFixed(1)} MB/s)
+                </span>
+              </div>
+              <div className="h-2 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-brand-500 rounded-full transition-all duration-300"
+                  style={{ width: `${updateStatus.progress.percent}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Downloaded and Ready to Install */}
+          {updateStatus.status === 'downloaded' && (
+            <div className="p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm">
+                <CheckCircle2 className="w-5 h-5" />
+                <span>تم تنزيل التحديث بنجاح وهو جاهز للتثبيت!</span>
+              </div>
+
+              <button
+                onClick={handleInstallUpdate}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span>إعادة التشغيل والتثبيت</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 6. App Info */}
       <div className="p-6 rounded-3xl bg-slate-100/70 dark:bg-dark-card/40 border border-slate-200/80 dark:border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Info className="w-5 h-5 text-slate-400" />
           <div>
-            <div className="text-sm font-bold text-slate-800 dark:text-slate-200">قرآني - Quran Desktop v1.0.0</div>
+            <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              قرآني - Quran Desktop v{updateStatus.currentVersion}
+            </div>
             <div className="text-xs text-slate-500 dark:text-slate-400">
               مدعوم بواسطة MP3Quran API v3 • مصمم بنظام Electron.js و React و TypeScript
             </div>

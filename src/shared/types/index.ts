@@ -145,6 +145,36 @@ export type MediaActionType =
   | 'set-speed'
   | 'set-repeat';
 
+export type UpdateStatusType =
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'not-available'
+  | 'downloading'
+  | 'downloaded'
+  | 'error';
+
+export interface UpdateInfoPayload {
+  version: string;
+  releaseDate?: string;
+  releaseNotes?: string | Array<{ note?: string; version?: string }>;
+}
+
+export interface UpdateProgressPayload {
+  bytesPerSecond: number;
+  percent: number;
+  transferred: number;
+  total: number;
+}
+
+export interface UpdateStatusPayload {
+  status: UpdateStatusType;
+  currentVersion: string;
+  updateInfo?: UpdateInfoPayload;
+  progress?: UpdateProgressPayload;
+  error?: string;
+}
+
 export interface ElectronAPI {
   app: {
     minimizeToTray: () => Promise<void>;
@@ -162,6 +192,13 @@ export interface ElectronAPI {
   notifications: {
     show: (title: string, body: string) => Promise<void>;
   };
+  updater: {
+    check: () => Promise<{ success: boolean; message?: string }>;
+    download: () => Promise<{ success: boolean; message?: string }>;
+    install: () => Promise<void>;
+    getStatus: () => Promise<UpdateStatusPayload>;
+    onStatusChange: (callback: (status: UpdateStatusPayload) => void) => () => void;
+  };
   onMediaAction: (callback: (action: MediaActionType, payload?: any) => void) => () => void;
 }
 
@@ -170,4 +207,5 @@ declare global {
     electronAPI?: ElectronAPI;
   }
 }
+
 

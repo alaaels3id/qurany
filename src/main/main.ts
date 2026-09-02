@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createSystemTray } from './tray';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts';
 import { registerIpcHandlers } from './ipc';
+import { initAutoUpdater } from './updater';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,10 +54,11 @@ function createWindow() {
     mainWindow.loadFile(path.join(process.env.DIST || path.join(__dirname, '../..'), 'index.html'));
   }
 
-  // Register Tray, IPC and Shortcuts
+  // Register Tray, IPC, Shortcuts and Updater
   createSystemTray(mainWindow);
   registerGlobalShortcuts(mainWindow);
   registerIpcHandlers(mainWindow);
+  initAutoUpdater(mainWindow);
 
   // Minimize to tray on close if not quitting explicitly
   mainWindow.on('close', (event) => {

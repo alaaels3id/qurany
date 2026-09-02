@@ -1,6 +1,12 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
 import { updateTrayTrackInfo, updateTrayPlayerState } from './tray';
 import { showNotification } from './notifications';
+import {
+  checkForUpdates,
+  downloadUpdate,
+  quitAndInstallUpdate,
+  getUpdaterStatus,
+} from './updater';
 import type { TrayPlayerState } from '../shared/types';
 
 export function registerIpcHandlers(mainWindow: BrowserWindow) {
@@ -58,5 +64,22 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
   // Notifications
   ipcMain.handle('notifications:show', (_event, title: string, body: string) => {
     showNotification(title, body);
+  });
+
+  // Auto Updater
+  ipcMain.handle('updater:check', async () => {
+    return await checkForUpdates();
+  });
+
+  ipcMain.handle('updater:download', async () => {
+    return await downloadUpdate();
+  });
+
+  ipcMain.handle('updater:install', () => {
+    quitAndInstallUpdate();
+  });
+
+  ipcMain.handle('updater:getStatus', () => {
+    return getUpdaterStatus();
   });
 }

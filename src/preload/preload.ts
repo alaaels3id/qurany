@@ -21,6 +21,21 @@ const electronAPI: ElectronAPI = {
     show: (title: string, body: string) =>
       ipcRenderer.invoke('notifications:show', title, body),
   },
+  updater: {
+    check: () => ipcRenderer.invoke('updater:check'),
+    download: () => ipcRenderer.invoke('updater:download'),
+    install: () => ipcRenderer.invoke('updater:install'),
+    getStatus: () => ipcRenderer.invoke('updater:getStatus'),
+    onStatusChange: (callback) => {
+      const subscription = (_event: any, status: any) => {
+        callback(status);
+      };
+      ipcRenderer.on('updater:status', subscription);
+      return () => {
+        ipcRenderer.removeListener('updater:status', subscription);
+      };
+    },
+  },
   onMediaAction: (callback) => {
     const subscription = (_event: any, action: any, payload?: any) => {
       callback(action, payload);
