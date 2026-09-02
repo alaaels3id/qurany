@@ -25,9 +25,9 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio }) => {
 
   return (
     <div
-      className={`p-5 rounded-2xl glass-panel transition-all duration-300 relative group hover:border-brand-500/40 hover:bg-white/5 hover:-translate-y-1 flex flex-col justify-between ${
+      className={`p-5 rounded-2xl glass-panel transition-all duration-300 relative group hover:border-brand-500/40 hover:bg-slate-50/50 dark:hover:bg-white/5 hover:-translate-y-1 flex flex-col justify-between ${
         isCurrent
-          ? 'border-brand-500/60 bg-gradient-to-b from-brand-950/20 to-dark-card shadow-lg shadow-brand-500/5'
+          ? 'border-brand-500/60 bg-gradient-to-b from-brand-50/70 to-white dark:from-brand-950/20 dark:to-dark-card shadow-lg shadow-brand-500/5'
           : ''
       }`}
     >
@@ -37,7 +37,7 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio }) => {
             className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-all ${
               isCurrent
                 ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
-                : 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/20'
+                : 'bg-emerald-50 text-emerald-600 border border-emerald-500/20 dark:bg-emerald-950/40 dark:text-emerald-400'
             }`}
           >
             <RadioIcon className="w-5 h-5" />
@@ -45,15 +45,15 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio }) => {
 
           <div className="flex items-center gap-1.5">
             {isCurrent && isPlaying && (
-              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 مباشر
               </span>
             )}
 
             <button
               onClick={() => toggleFavoriteRadio(radio.id)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"
               title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
             >
               <Heart
@@ -65,14 +65,14 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio }) => {
           </div>
         </div>
 
-        <h3 className="font-bold text-base text-slate-100 font-cairo mb-2 group-hover:text-emerald-400 transition-colors">
+        <h3 className="font-bold text-base text-slate-800 dark:text-slate-100 font-cairo mb-2 group-hover:text-brand-600 dark:group-hover:text-emerald-400 transition-colors">
           {radio.name}
         </h3>
       </div>
 
-      <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs text-slate-400">
-          <Activity className="w-3.5 h-3.5 text-emerald-400" />
+      <div className="pt-3 border-t border-slate-200/80 dark:border-white/5 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <Activity className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
           <span>إذاعة إسلامية</span>
         </div>
 
@@ -81,7 +81,7 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio }) => {
           className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
             isCurrent && isPlaying
               ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30'
-              : 'bg-white/5 hover:bg-brand-500 text-slate-200 hover:text-white border border-white/10 hover:border-brand-400'
+              : 'bg-slate-100 dark:bg-white/5 hover:bg-brand-500 text-slate-700 dark:text-slate-200 hover:text-white border border-slate-200 dark:border-white/10 hover:border-brand-400'
           }`}
           title={isCurrent && isPlaying ? 'إيقاف البث' : 'تشغيل البث'}
         >

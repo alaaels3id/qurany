@@ -118,6 +118,33 @@ export interface AppSettings {
   playbackRate: number;
 }
 
+export interface TrayPlayerState {
+  title: string;
+  subtitle?: string;
+  isPlaying: boolean;
+  hasTrack: boolean;
+  isRadio?: boolean;
+  volume: number; // 0 to 1
+  isMuted: boolean;
+  playbackRate: number;
+  repeatMode: RepeatMode;
+  canGoNext?: boolean;
+  canGoPrev?: boolean;
+}
+
+export type MediaActionType =
+  | 'play'
+  | 'pause'
+  | 'toggle'
+  | 'stop'
+  | 'next'
+  | 'prev'
+  | 'volume-up'
+  | 'volume-down'
+  | 'toggle-mute'
+  | 'set-speed'
+  | 'set-repeat';
+
 export interface ElectronAPI {
   app: {
     minimizeToTray: () => Promise<void>;
@@ -129,11 +156,12 @@ export interface ElectronAPI {
   };
   tray: {
     updateTrackInfo: (title: string, subtitle?: string, isPlaying?: boolean) => Promise<void>;
+    updatePlayerState: (state: TrayPlayerState) => Promise<void>;
   };
   notifications: {
     show: (title: string, body: string) => Promise<void>;
   };
-  onMediaAction: (callback: (action: 'play' | 'pause' | 'next' | 'prev' | 'toggle') => void) => () => void;
+  onMediaAction: (callback: (action: MediaActionType, payload?: any) => void) => () => void;
 }
 
 declare global {
@@ -141,3 +169,4 @@ declare global {
     electronAPI?: ElectronAPI;
   }
 }
+

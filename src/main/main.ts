@@ -18,12 +18,17 @@ let mainWindow: BrowserWindow | null = null;
 (app as any).isQuitting = false;
 
 function createWindow() {
+  const iconPath = app.isPackaged
+    ? path.join(process.env.DIST || path.join(__dirname, '../..'), 'icon.png')
+    : path.join(__dirname, '../../build/icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 820,
     minWidth: 960,
     minHeight: 640,
     title: 'قرآني - Quran Desktop',
+    icon: iconPath,
     backgroundColor: '#0a0f18',
     frame: true, // Clean native frame with title
     titleBarStyle: 'default',

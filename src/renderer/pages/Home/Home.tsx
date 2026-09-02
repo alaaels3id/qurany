@@ -70,30 +70,30 @@ export const Home: React.FC<HomeProps> = ({
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Hero: Continue Listening / Featured Card */}
       {lastPlayed ? (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-950 via-dark-card to-dark-card border border-brand-500/30 p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-50 via-white to-slate-50 dark:from-brand-950 dark:via-dark-card dark:to-dark-card border border-brand-500/25 p-8 shadow-md dark:shadow-2xl">
           <div className="absolute top-0 left-0 -mt-8 -ml-8 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex items-center justify-between">
             <div className="space-y-3 max-w-lg">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/15 border border-brand-500/30 text-brand-400 text-xs font-semibold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 dark:bg-brand-500/15 border border-brand-500/30 text-brand-700 dark:text-brand-400 text-xs font-semibold">
                 <Clock className="w-3.5 h-3.5" />
                 <span>متابعة الاستماع</span>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-slate-100 font-cairo">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">
                   سورة {lastPlayed.surahName}
                 </h2>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                   القارئ {lastPlayed.reciterName} • {lastPlayed.moshafName}
                 </p>
               </div>
 
               {lastPlayed.durationSeconds > 0 && (
                 <div className="w-64 space-y-1">
-                  <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-brand-400 rounded-full"
+                      className="h-full bg-brand-500 dark:bg-brand-400 rounded-full"
                       style={{
                         width: `${Math.min(
                           100,
@@ -102,7 +102,7 @@ export const Home: React.FC<HomeProps> = ({
                       }}
                     />
                   </div>
-                  <div className="text-[10px] text-slate-400 text-left">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 text-left">
                     متبقي{' '}
                     {Math.max(
                       0,
@@ -128,14 +128,14 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </div>
       ) : (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/60 via-dark-card to-dark-card border border-brand-500/20 p-8 shadow-xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-50 via-white to-slate-50 dark:from-emerald-950/60 dark:via-dark-card dark:to-dark-card border border-brand-500/20 p-8 shadow-md dark:shadow-xl">
           <div className="relative z-10 flex items-center justify-between">
             <div className="space-y-2">
-              <span className="text-xs font-semibold text-brand-400">بِسْمِ اللَّـهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
-              <h2 className="text-2xl font-bold text-slate-100 font-cairo">
+              <span className="text-xs font-semibold text-brand-700 dark:text-brand-400">بِسْمِ اللَّـهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-cairo">
                 اقْرَأْ وَرَبُّكَ الْأَكْرَمُ
               </h2>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 استمع إلى تلاوات القرآن الكريم بأصوات نخبة من أشهر القراء في العالم الإسلامي.
               </p>
             </div>
@@ -154,12 +154,12 @@ export const Home: React.FC<HomeProps> = ({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-amber-400" />
-            <h3 className="font-bold text-lg text-slate-100 font-cairo">سور مختارة</h3>
+            <Flame className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+            <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">سور مختارة</h3>
           </div>
           <button
             onClick={() => onNavigate('surahs')}
-            className="text-xs font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1 transition-colors"
+            className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 transition-colors"
           >
             <span>عرض كل السور (114)</span>
             <ChevronLeft className="w-4 h-4" />
@@ -182,12 +182,12 @@ export const Home: React.FC<HomeProps> = ({
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Mic2 className="w-5 h-5 text-brand-400" />
-              <h3 className="font-bold text-lg text-slate-100 font-cairo">كبار القراء</h3>
+              <Mic2 className="w-5 h-5 text-brand-500 dark:text-brand-400" />
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">كبار القراء</h3>
             </div>
             <button
               onClick={() => onNavigate('reciters')}
-              className="text-xs font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 transition-colors"
             >
               <span>كل القراء والمصاحف</span>
               <ChevronLeft className="w-4 h-4" />
@@ -211,12 +211,12 @@ export const Home: React.FC<HomeProps> = ({
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <RadioIcon className="w-5 h-5 text-emerald-400" />
-              <h3 className="font-bold text-lg text-slate-100 font-cairo">إذاعات البث المباشر</h3>
+              <RadioIcon className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">إذاعات البث المباشر</h3>
             </div>
             <button
               onClick={() => onNavigate('radio')}
-              className="text-xs font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 transition-colors"
             >
               <span>جميع الإذاعات</span>
               <ChevronLeft className="w-4 h-4" />

@@ -49,7 +49,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'surahs'
               ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
           <BookOpen className="w-4 h-4" />
@@ -61,7 +61,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'reciters'
               ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
           <Mic2 className="w-4 h-4" />
@@ -73,7 +73,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'radios'
               ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
           <RadioIcon className="w-4 h-4" />
@@ -86,13 +86,13 @@ export const Favorites: React.FC<FavoritesProps> = ({
         <div>
           {favoriteSurahs.length === 0 ? (
             <div className="py-20 text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mx-auto">
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 mx-auto">
                 <Heart className="w-8 h-8 opacity-40" />
               </div>
-              <h4 className="text-base font-bold text-slate-300 font-cairo">
+              <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
                 لا توجد سور في المفضلة بعد
               </h4>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 انقر على أيقونة القلب في بطاقة السورة لإضافتها هنا
               </p>
             </div>
@@ -115,13 +115,13 @@ export const Favorites: React.FC<FavoritesProps> = ({
         <div>
           {favoriteRecitersList.length === 0 ? (
             <div className="py-20 text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mx-auto">
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 mx-auto">
                 <Mic2 className="w-8 h-8 opacity-40" />
               </div>
-              <h4 className="text-base font-bold text-slate-300 font-cairo">
+              <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
                 لا يوجد قراء في المفضلة بعد
               </h4>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 انقر على أيقونة القلب في بطاقة القارئ للوصول السريع إليه
               </p>
             </div>
@@ -143,13 +143,13 @@ export const Favorites: React.FC<FavoritesProps> = ({
         <div>
           {favoriteRadiosList.length === 0 ? (
             <div className="py-20 text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mx-auto">
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 mx-auto">
                 <RadioIcon className="w-8 h-8 opacity-40" />
               </div>
-              <h4 className="text-base font-bold text-slate-300 font-cairo">
+              <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
                 لا توجد إذاعات في المفضلة بعد
               </h4>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 انقر على أيقونة القلب بجانب الإذاعة لإضافتها للمفضلة
               </p>
             </div>

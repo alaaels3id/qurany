@@ -43,13 +43,13 @@ export const Surahs: React.FC<SurahsProps> = ({
       {/* Filters & Layout Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl glass-panel">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-brand-400 mr-1" />
+          <Filter className="w-4 h-4 text-brand-500 dark:text-brand-400 mr-1" />
           <button
             onClick={() => setTypeFilter('all')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               typeFilter === 'all'
                 ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             الكل (114)
@@ -59,7 +59,7 @@ export const Surahs: React.FC<SurahsProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               typeFilter === 'makki'
                 ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             مكية (86)
@@ -69,7 +69,7 @@ export const Surahs: React.FC<SurahsProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               typeFilter === 'madani'
                 ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             مدنية (28)
@@ -77,13 +77,13 @@ export const Surahs: React.FC<SurahsProps> = ({
         </div>
 
         {/* Layout Switcher */}
-        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10">
           <button
             onClick={() => setLayout('grid')}
             className={`p-2 rounded-lg transition-all ${
               layout === 'grid'
                 ? 'bg-brand-500 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="عرض شبكي"
           >
@@ -94,7 +94,7 @@ export const Surahs: React.FC<SurahsProps> = ({
             className={`p-2 rounded-lg transition-all ${
               layout === 'list'
                 ? 'bg-brand-500 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="عرض قائمة"
           >
@@ -106,13 +106,13 @@ export const Surahs: React.FC<SurahsProps> = ({
       {/* Surahs Container */}
       {filteredSurahs.length === 0 ? (
         <div className="py-20 text-center space-y-3">
-          <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mx-auto">
+          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 mx-auto">
             <Sparkles className="w-8 h-8 opacity-40" />
           </div>
-          <h4 className="text-base font-bold text-slate-300 font-cairo">
+          <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
             لم يتم العثور على أي سورة
           </h4>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             تأكد من كتابة اسم السورة أو رقمها بشكل صحيح
           </p>
         </div>

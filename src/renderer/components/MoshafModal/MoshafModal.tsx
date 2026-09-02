@@ -85,21 +85,21 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-200 select-none">
-      <div className="bg-dark-card border border-white/10 rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Modal Header */}
-        <div className="p-6 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-brand-950/40 via-dark-card to-dark-card">
+        <div className="p-6 border-b border-slate-200/80 dark:border-white/5 flex items-center justify-between bg-gradient-to-r from-emerald-50/70 via-white to-white dark:from-brand-950/40 dark:via-dark-card dark:to-dark-card">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-700 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 font-bold text-xl font-amiri">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-500 dark:from-brand-700 dark:to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 font-bold text-xl font-amiri">
               {reciter.name[0] || 'ق'}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-slate-100 font-cairo">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-cairo">
                   القارئ {reciter.name}
                 </h2>
                 <button
                   onClick={() => toggleFavoriteReciter(reciter.id)}
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 transition-colors"
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
                   title="المفضلة"
                 >
                   <Heart
@@ -109,7 +109,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                   />
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 متاح {reciter.moshaf?.length || 1} مصاحف وروايات • {availableSurahIds.length} سورة
               </p>
             </div>
@@ -126,7 +126,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -135,16 +135,16 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
 
         {/* Moshafs / Riwayat Selector Tabs */}
         {reciter.moshaf && reciter.moshaf.length > 1 && (
-          <div className="px-6 py-3 border-b border-white/5 flex items-center gap-2 overflow-x-auto bg-dark-bg/40">
-            <span className="text-xs font-semibold text-slate-400 pl-2">المصحف / الرواية:</span>
+          <div className="px-6 py-3 border-b border-slate-200/80 dark:border-white/5 flex items-center gap-2 overflow-x-auto bg-slate-50/80 dark:bg-dark-bg/40">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 pl-2">المصحف / الرواية:</span>
             {reciter.moshaf.map((moshaf, idx) => (
               <button
                 key={moshaf.id || idx}
                 onClick={() => setSelectedMoshafIndex(idx)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
                   selectedMoshafIndex === idx
-                    ? 'bg-brand-500/20 text-brand-400 border border-brand-500/40 font-bold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    ? 'bg-brand-500/15 text-brand-700 dark:text-brand-400 border border-brand-500/40 font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/5'
                 }`}
               >
                 {moshaf.name} ({moshaf.surah_total} سورة)
@@ -154,7 +154,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
         )}
 
         {/* Search within Reciter's Surahs */}
-        <div className="p-4 border-b border-white/5 bg-dark-bg/20">
+        <div className="p-4 border-b border-slate-200/80 dark:border-white/5 bg-slate-50/40 dark:bg-dark-bg/20">
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -162,7 +162,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
               value={surahSearch}
               onChange={(e) => setSurahSearch(e.target.value)}
               placeholder="ابحث في سور هذا المصحف..."
-              className="w-full pl-4 pr-10 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500/40"
+              className="w-full pl-4 pr-10 py-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500/50"
             />
           </div>
         </div>
@@ -186,10 +186,10 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                     handlePlaySurah(surah);
                   }
                 }}
-                className={`p-3.5 rounded-2xl border transition-all duration-200 flex items-center justify-between cursor-pointer group hover:border-brand-500/40 hover:bg-white/5 ${
+                className={`p-3.5 rounded-2xl border transition-all duration-200 flex items-center justify-between cursor-pointer group hover:border-brand-500/40 hover:bg-slate-50 dark:hover:bg-white/5 ${
                   isCurrent
-                    ? 'bg-brand-500/15 border-brand-500/50 text-brand-400'
-                    : 'bg-white/5 border-white/5 text-slate-300'
+                    ? 'bg-brand-50/80 dark:bg-brand-500/15 border-brand-500/50 text-brand-700 dark:text-brand-400 font-bold'
+                    : 'bg-slate-50/50 dark:bg-white/5 border-slate-200/70 dark:border-white/5 text-slate-700 dark:text-slate-300'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -197,16 +197,16 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                     className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono text-xs font-bold ${
                       isCurrent
                         ? 'bg-brand-500 text-white'
-                        : 'bg-white/5 text-slate-400 group-hover:text-white'
+                        : 'bg-slate-200/70 dark:bg-white/5 text-slate-600 dark:text-slate-400 group-hover:bg-slate-300 dark:group-hover:text-white'
                     }`}
                   >
                     {surah.id}
                   </span>
                   <div>
-                    <h4 className="font-bold text-sm font-amiri text-slate-100 group-hover:text-brand-400">
+                    <h4 className="font-bold text-sm font-amiri text-slate-800 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400">
                       سورة {surah.name}
                     </h4>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
                       {surah.ayahCount} آية • {surah.makkia === 1 ? 'مكية' : 'مدنية'}
                     </span>
                   </div>
@@ -216,7 +216,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                   className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
                     isCurrent && isPlaying
                       ? 'bg-brand-500 text-white'
-                      : 'bg-white/5 group-hover:bg-brand-500 group-hover:text-white text-slate-400'
+                      : 'bg-slate-200/70 dark:bg-white/5 group-hover:bg-brand-500 group-hover:text-white text-slate-500 dark:text-slate-400'
                   }`}
                 >
                   {isCurrent && isPlaying ? (

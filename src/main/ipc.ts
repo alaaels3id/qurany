@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
-import { updateTrayTrackInfo } from './tray';
+import { updateTrayTrackInfo, updateTrayPlayerState } from './tray';
 import { showNotification } from './notifications';
+import type { TrayPlayerState } from '../shared/types';
 
 export function registerIpcHandlers(mainWindow: BrowserWindow) {
   // App Window Controls
@@ -38,6 +39,13 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
     'tray:updateTrackInfo',
     (_event, title: string, subtitle?: string, isPlaying?: boolean) => {
       updateTrayTrackInfo(mainWindow, title, subtitle, isPlaying);
+    }
+  );
+
+  ipcMain.handle(
+    'tray:updatePlayerState',
+    (_event, state: TrayPlayerState) => {
+      updateTrayPlayerState(mainWindow, state);
     }
   );
 

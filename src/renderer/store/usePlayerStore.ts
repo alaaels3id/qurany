@@ -15,6 +15,41 @@ function getAudio(): HTMLAudioElement {
   return audioElement!;
 }
 
+function syncTrayWithStore(state: PlayerStoreState) {
+  if (typeof window === 'undefined' || !window.electronAPI?.tray?.updatePlayerState) return;
+
+  const current = state.currentTrack;
+  let title = 'قرآني';
+  let subtitle = '';
+
+  if (current) {
+    if (current.type === 'radio') {
+      title = current.radioName || 'إذاعة القرآن الكريم';
+      subtitle = 'بث مباشر';
+    } else {
+      title = current.surahName ? `سورة ${current.surahName}` : 'سورة';
+      subtitle = current.reciterName || '';
+    }
+  }
+
+  const canGoNext = state.queue.length > 1;
+  const canGoPrev = state.queue.length > 1;
+
+  window.electronAPI.tray.updatePlayerState({
+    title,
+    subtitle,
+    isPlaying: state.isPlaying,
+    hasTrack: Boolean(current),
+    isRadio: current?.type === 'radio',
+    volume: state.volume,
+    isMuted: state.isMuted,
+    playbackRate: state.playbackRate,
+    repeatMode: state.repeatMode,
+    canGoNext,
+    canGoPrev,
+  }).catch(() => {});
+}
+
 interface PlayerStoreState {
   currentTrack: ActiveTrack | null;
   queue: QueueItem[];
@@ -35,6 +70,7 @@ interface PlayerStoreState {
   togglePlay: () => void;
   pause: () => void;
   resume: () => void;
+  stop: () => void;
   seek: (seconds: number) => void;
   nextTrack: () => void;
   prevTrack: () => void;
@@ -64,24 +100,17 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
   initAudioListeners: () => {
     const audio = getAudio();
 
+    // Initial tray sync
+    syncTrayWithStore(get());
+
     audio.onplay = () => {
       set({ isPlaying: true });
-      const current = get().currentTrack;
-      if (current && window.electronAPI) {
-        const title = current.type === 'radio' ? (current.radioName || 'إذاعة') : (current.surahName || 'سورة');
-        const sub = current.type === 'radio' ? 'بث مباشر' : current.reciterName;
-        window.electronAPI.tray.updateTrackInfo(title, sub, true);
-      }
+      syncTrayWithStore(get());
     };
 
     audio.onpause = () => {
       set({ isPlaying: false });
-      const current = get().currentTrack;
-      if (current && window.electronAPI) {
-        const title = current.type === 'radio' ? (current.radioName || 'إذاعة') : (current.surahName || 'سورة');
-        const sub = current.type === 'radio' ? 'بث مباشر' : current.reciterName;
-        window.electronAPI.tray.updateTrackInfo(title, sub, false);
-      }
+      syncTrayWithStore(get());
     };
 
     audio.onwaiting = () => {
@@ -90,6 +119,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
 
     audio.onplaying = () => {
       set({ isLoading: false, isPlaying: true });
+      syncTrayWithStore(get());
     };
 
     audio.onloadedmetadata = () => {
@@ -131,17 +161,19 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
         get().nextTrack();
       } else {
         set({ isPlaying: false, progress: 0 });
+        syncTrayWithStore(get());
       }
     };
 
     audio.onerror = (e) => {
       console.error('Audio playback error:', e);
       set({ isPlaying: false, isLoading: false });
+      syncTrayWithStore(get());
     };
 
-    // Listen to OS media key events from Electron main process
+    // Listen to OS media key events and System Tray controls from Electron main process
     if (window.electronAPI) {
-      window.electronAPI.onMediaAction((action) => {
+      window.electronAPI.onMediaAction((action, payload) => {
         switch (action) {
           case 'toggle':
             get().togglePlay();
@@ -152,11 +184,37 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
           case 'pause':
             get().pause();
             break;
+          case 'stop':
+            get().stop();
+            break;
           case 'next':
             get().nextTrack();
             break;
           case 'prev':
             get().prevTrack();
+            break;
+          case 'volume-up': {
+            const currentVol = get().volume;
+            get().setVolume(Math.min(1, Math.round((currentVol + 0.1) * 10) / 10));
+            break;
+          }
+          case 'volume-down': {
+            const currentVol = get().volume;
+            get().setVolume(Math.max(0, Math.round((currentVol - 0.1) * 10) / 10));
+            break;
+          }
+          case 'toggle-mute':
+            get().toggleMute();
+            break;
+          case 'set-speed':
+            if (typeof payload === 'number') {
+              get().setPlaybackRate(payload);
+            }
+            break;
+          case 'set-repeat':
+            if (payload === 'off' || payload === 'one' || payload === 'all') {
+              get().setRepeatMode(payload);
+            }
             break;
         }
       });
@@ -266,13 +324,31 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     const audio = getAudio();
     audio.pause();
     set({ isPlaying: false });
+    syncTrayWithStore(get());
   },
 
   resume: () => {
     const audio = getAudio();
     if (audio.src) {
       audio.play().catch(console.error);
+      set({ isPlaying: true });
+      syncTrayWithStore(get());
     }
+  },
+
+  stop: () => {
+    const audio = getAudio();
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = '';
+    set({
+      currentTrack: null,
+      isPlaying: false,
+      isLoading: false,
+      progress: 0,
+      duration: 0,
+    });
+    syncTrayWithStore(get());
   },
 
   seek: (seconds: number) => {
@@ -355,6 +431,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     const clamped = Math.max(0, Math.min(1, volume));
     audio.volume = clamped;
     set({ volume: clamped, isMuted: clamped === 0 });
+    syncTrayWithStore(get());
   },
 
   toggleMute: () => {
@@ -367,6 +444,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       audio.volume = 0;
       set({ isMuted: true });
     }
+    syncTrayWithStore(get());
   },
 
   setPlaybackRate: (rate: number) => {
@@ -374,10 +452,12 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     audio.playbackRate = rate;
     set({ playbackRate: rate });
     useSettingsStore.getState().setPlaybackRate(rate);
+    syncTrayWithStore(get());
   },
 
   setRepeatMode: (repeatMode: RepeatMode) => {
     set({ repeatMode });
+    syncTrayWithStore(get());
   },
 
   toggleAutoNext: () => {
