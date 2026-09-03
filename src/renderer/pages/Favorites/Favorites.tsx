@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Heart, BookOpen, Mic2, Radio as RadioIcon } from 'lucide-react';
+import { Heart, BookOpen, Mic2, Radio as RadioIcon, List, LayoutGrid } from 'lucide-react';
 import type { Surah, Reciter, Radio } from '@/shared/types';
 import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
 import { SurahCard } from '@/renderer/components/SurahCard/SurahCard';
@@ -26,6 +26,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
   onSelectReciter,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('surahs');
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const { favoriteSurahIds, favoriteReciterIds, favoriteRadioIds } = useFavoritesStore();
 
   const favoriteSurahs = useMemo(() => {
@@ -42,43 +43,70 @@ export const Favorites: React.FC<FavoritesProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 select-none">
-      {/* Tab Switcher */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl glass-panel w-fit">
-        <button
-          onClick={() => setActiveTab('surahs')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-            activeTab === 'surahs'
-              ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          <span>السور المفضلة ({favoriteSurahs.length})</span>
-        </button>
+      {/* Tab Switcher & Layout Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl glass-panel w-fit overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('surahs')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'surahs'
+                ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>السور المفضلة ({favoriteSurahs.length})</span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('reciters')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-            activeTab === 'reciters'
-              ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Mic2 className="w-4 h-4" />
-          <span>القراء المفضلون ({favoriteRecitersList.length})</span>
-        </button>
+          <button
+            onClick={() => setActiveTab('reciters')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'reciters'
+                ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+          >
+            <Mic2 className="w-4 h-4" />
+            <span>القراء المفضلون ({favoriteRecitersList.length})</span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab('radios')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-            activeTab === 'radios'
-              ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <RadioIcon className="w-4 h-4" />
-          <span>الإذاعات المفضلة ({favoriteRadiosList.length})</span>
-        </button>
+          <button
+            onClick={() => setActiveTab('radios')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'radios'
+                ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+          >
+            <RadioIcon className="w-4 h-4" />
+            <span>الإذاعات المفضلة ({favoriteRadiosList.length})</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 flex-shrink-0">
+          <button
+            onClick={() => setLayout('list')}
+            className={`p-2 rounded-lg transition-all ${
+              layout === 'list'
+                ? 'bg-brand-500 text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+            title="عرض قائمة"
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setLayout('grid')}
+            className={`p-2 rounded-lg transition-all ${
+              layout === 'grid'
+                ? 'bg-brand-500 text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+            title="عرض شبكي"
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Tab Content */}
@@ -97,11 +125,18 @@ export const Favorites: React.FC<FavoritesProps> = ({
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div
+              className={
+                layout === 'grid'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
+                  : 'space-y-3'
+              }
+            >
               {favoriteSurahs.map((surah) => (
                 <SurahCard
                   key={surah.id}
                   surah={surah}
+                  layout={layout}
                   onPlayDirect={onPlaySurahDirect}
                   onOpenReciterPicker={onOpenReciterPicker}
                 />
@@ -126,11 +161,18 @@ export const Favorites: React.FC<FavoritesProps> = ({
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div
+              className={
+                layout === 'grid'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
+                  : 'space-y-3'
+              }
+            >
               {favoriteRecitersList.map((reciter) => (
                 <ReciterCard
                   key={reciter.id}
                   reciter={reciter}
+                  layout={layout}
                   onSelectReciter={onSelectReciter}
                 />
               ))}
@@ -154,9 +196,15 @@ export const Favorites: React.FC<FavoritesProps> = ({
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div
+              className={
+                layout === 'grid'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
+                  : 'space-y-3'
+              }
+            >
               {favoriteRadiosList.map((radio) => (
-                <RadioCard key={radio.id} radio={radio} />
+                <RadioCard key={radio.id} radio={radio} layout={layout} />
               ))}
             </div>
           )}

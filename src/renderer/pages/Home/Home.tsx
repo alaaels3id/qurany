@@ -1,5 +1,5 @@
-import React from 'react';
-import { Play, Pause, Clock, Flame, ChevronLeft, Mic2, Radio as RadioIcon, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Pause, Clock, Flame, ChevronLeft, Mic2, Radio as RadioIcon, BookOpen, List, LayoutGrid } from 'lucide-react';
 import type { Surah, Reciter, Radio, RecentRead } from '@/shared/types';
 import { useHistoryStore } from '@/renderer/store/useHistoryStore';
 import { usePlayerStore } from '@/renderer/store/usePlayerStore';
@@ -27,6 +27,7 @@ export const Home: React.FC<HomeProps> = ({
   onSelectReciter,
   onPlaySurahDirect,
 }) => {
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const { lastPlayed } = useHistoryStore();
   const { currentTrack, isPlaying, playTrack, togglePlay } = usePlayerStore();
 
@@ -152,25 +153,60 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* Section 1: Quick Access Surahs */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Flame className="w-5 h-5 text-amber-500 dark:text-amber-400" />
             <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">سور مختارة</h3>
           </div>
-          <button
-            onClick={() => onNavigate('surahs')}
-            className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 transition-colors"
-          >
-            <span>عرض كل السور (114)</span>
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 flex-shrink-0">
+              <button
+                onClick={() => setLayout('list')}
+                className={`p-1.5 rounded-lg transition-all ${
+                  layout === 'list'
+                    ? 'bg-brand-500 text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="عرض قائمة"
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setLayout('grid')}
+                className={`p-1.5 rounded-lg transition-all ${
+                  layout === 'grid'
+                    ? 'bg-brand-500 text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="عرض شبكي"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigate('surahs')}
+              className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 transition-colors"
+            >
+              <span>عرض كل السور (114)</span>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          className={
+            layout === 'grid'
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
+              : 'space-y-3'
+          }
+        >
           {quickSurahs.map((surah) => (
             <SurahCard
               key={surah.id}
               surah={surah}
+              layout={layout}
               onPlayDirect={onPlaySurahDirect}
             />
           ))}
@@ -194,11 +230,18 @@ export const Home: React.FC<HomeProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div
+            className={
+              layout === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'
+                : 'space-y-3'
+            }
+          >
             {featuredReciters.map((reciter) => (
               <ReciterCard
                 key={reciter.id}
                 reciter={reciter}
+                layout={layout}
                 onSelectReciter={onSelectReciter}
               />
             ))}
@@ -223,9 +266,15 @@ export const Home: React.FC<HomeProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div
+            className={
+              layout === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-3 gap-4'
+                : 'space-y-3'
+            }
+          >
             {featuredRadios.map((radio) => (
-              <RadioCard key={radio.id} radio={radio} />
+              <RadioCard key={radio.id} radio={radio} layout={layout} />
             ))}
           </div>
         </section>

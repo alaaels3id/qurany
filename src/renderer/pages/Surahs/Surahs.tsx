@@ -17,7 +17,7 @@ export const Surahs: React.FC<SurahsProps> = ({
   onPlayDirect,
   onOpenReciterPicker,
 }) => {
-  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const [typeFilter, setTypeFilter] = useState<'all' | 'makki' | 'madani'>('all');
 
   const filteredSurahs = useMemo(() => {

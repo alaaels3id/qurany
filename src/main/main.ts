@@ -10,17 +10,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Process environment
-process.env.DIST = path.join(__dirname, '../..');
+const distPath = path.join(__dirname, '../../dist');
+process.env.DIST = distPath;
 process.env.VITE_PUBLIC = app.isPackaged
-  ? process.env.DIST
-  : path.join(process.env.DIST, '../public');
+  ? distPath
+  : path.join(__dirname, '../../public');
 
 let mainWindow: BrowserWindow | null = null;
 (app as any).isQuitting = false;
 
 function createWindow() {
   const iconPath = app.isPackaged
-    ? path.join(process.env.DIST || path.join(__dirname, '../..'), 'icon.png')
+    ? path.join(distPath, 'icon.png')
     : path.join(__dirname, '../../build/icon.png');
 
   mainWindow = new BrowserWindow({
@@ -51,8 +52,12 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(process.env.DIST || path.join(__dirname, '../..'), 'index.html'));
+    mainWindow.loadFile(path.join(distPath, 'index.html'));
   }
+
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('Failed to load URL:', errorCode, errorDescription, validatedURL);
+  });
 
   // Register Tray, IPC, Shortcuts and Updater
   createSystemTray(mainWindow);

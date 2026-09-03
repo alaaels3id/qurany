@@ -25,10 +25,12 @@ let playerState: TrayPlayerState = {
 
 function getTrayIcon(): NativeImage {
   const candidatePaths = [
+    path.join(__dirname, '../../dist/icon.png'),
     path.join(__dirname, '../../build/icon.png'),
     path.join(__dirname, '../../public/icon.png'),
     path.join(process.resourcesPath || '', 'build/icon.png'),
     path.join(process.resourcesPath || '', 'icon.png'),
+    path.join(app.getAppPath(), 'dist/icon.png'),
     path.join(app.getAppPath(), 'build/icon.png'),
     path.join(app.getAppPath(), 'public/icon.png'),
   ];

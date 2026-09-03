@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Mic2, Filter } from 'lucide-react';
+import { Mic2, Filter, List, LayoutGrid } from 'lucide-react';
 import type { Reciter, Riwayah } from '@/shared/types';
 import { ReciterCard } from '@/renderer/components/ReciterCard/ReciterCard';
 import { matchesArabic } from '@/renderer/utils/search';
@@ -23,6 +23,7 @@ export const Reciters: React.FC<RecitersProps> = ({
 }) => {
   const [selectedLetter, setSelectedLetter] = useState<string>('الكل');
   const [selectedRiwayah, setSelectedRiwayah] = useState<number | 'all'>('all');
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
 
   const filteredReciters = useMemo(() => {
     return reciters.filter((r) => {
@@ -96,12 +97,39 @@ export const Reciters: React.FC<RecitersProps> = ({
           </select>
         </div>
 
-        <div className="text-xs text-slate-500 dark:text-slate-400">
-          عدد القراء: <span className="text-brand-600 dark:text-brand-400 font-bold">{filteredReciters.length}</span>
+        <div className="flex items-center gap-4">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            عدد القراء: <span className="text-brand-600 dark:text-brand-400 font-bold">{filteredReciters.length}</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 flex-shrink-0">
+            <button
+              onClick={() => setLayout('list')}
+              className={`p-1.5 rounded-lg transition-all ${
+                layout === 'list'
+                  ? 'bg-brand-500 text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="عرض قائمة"
+            >
+              <List className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setLayout('grid')}
+              className={`p-1.5 rounded-lg transition-all ${
+                layout === 'grid'
+                  ? 'bg-brand-500 text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="عرض شبكي"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Reciters Grid */}
+      {/* Reciters List / Grid */}
       {filteredReciters.length === 0 ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 mx-auto">
@@ -113,11 +141,18 @@ export const Reciters: React.FC<RecitersProps> = ({
           <p className="text-xs text-slate-500 dark:text-slate-400">جرب البحث بكلمات أخرى أو اختر حرفاً مختلفاً</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div
+          className={
+            layout === 'grid'
+              ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
+              : 'space-y-3'
+          }
+        >
           {filteredReciters.map((reciter) => (
             <ReciterCard
               key={reciter.id}
               reciter={reciter}
+              layout={layout}
               onSelectReciter={onSelectReciter}
             />
           ))}
