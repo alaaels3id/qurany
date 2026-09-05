@@ -36,6 +36,16 @@
     user-select: none;
     -webkit-user-select: none;
   }
+
+  html[lang="en"] body,
+  html[dir="ltr"] body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  html[lang="en"] .font-cairo {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
 }
 
 /* Custom Sleek Scrollbar */

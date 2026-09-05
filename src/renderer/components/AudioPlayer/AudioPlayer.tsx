@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { usePlayerStore } from '@/renderer/store/usePlayerStore';
 import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
+import { useTranslation } from '@/renderer/i18n';
 
 function formatTime(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) return '00:00';
@@ -31,6 +32,7 @@ function formatTime(seconds: number): string {
 }
 
 export const AudioPlayer: React.FC = () => {
+  const { t, isRTL } = useTranslation();
   const {
     currentTrack,
     isPlaying,
@@ -70,8 +72,12 @@ export const AudioPlayer: React.FC = () => {
             <Sparkles className="w-5 h-5 opacity-60" />
           </div>
           <div>
-            <div className="text-sm font-medium text-slate-700 dark:text-slate-300">لم يتم اختيار تلاوة بعد</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">اختر سورة أو قارئ أو محطة إذاعية للبدء</div>
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              {t('audioPlayer.idleTitle')}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              {t('audioPlayer.idleDesc')}
+            </div>
           </div>
         </div>
       </div>
@@ -103,10 +109,13 @@ export const AudioPlayer: React.FC = () => {
 
   const speedOptions = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
+  const skipForwardTitle = isRTL ? t('audioPlayer.previousSurah') : t('audioPlayer.nextSurah');
+  const skipBackTitle = isRTL ? t('audioPlayer.nextSurah') : t('audioPlayer.previousSurah');
+
   return (
     <>
       <div className="h-24 glass-player flex items-center justify-between px-8 z-30 relative select-none border-t border-slate-200/80 dark:border-white/5">
-        {/* Left: Track Details */}
+        {/* Track Details */}
         <div className="flex items-center gap-4 w-1/4 min-w-[240px]">
           <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-500 dark:from-brand-900 dark:to-emerald-700/80 border border-brand-500/30 flex items-center justify-center text-white shadow-lg shadow-brand-500/10 flex-shrink-0">
             {isRadio ? (
@@ -130,11 +139,11 @@ export const AudioPlayer: React.FC = () => {
           <div className="truncate">
             <div className="flex items-center gap-2">
               <h4 className="font-bold text-base text-slate-800 dark:text-slate-100 font-cairo truncate">
-                {isRadio ? currentTrack.radioName : `سورة ${currentTrack.surahName || ''}`}
+                {isRadio ? currentTrack.radioName : `${t('common.surah')} ${currentTrack.surahName || ''}`}
               </h4>
               <button
                 onClick={handleFavoriteToggle}
-                title="إضافة للمفضلة"
+                title={t('common.addToFavorites')}
                 className="text-slate-400 hover:text-rose-500 transition-colors"
               >
                 <Heart
@@ -148,7 +157,7 @@ export const AudioPlayer: React.FC = () => {
               {isRadio ? (
                 <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  بث مباشر
+                  {t('audioPlayer.liveBroadcast')}
                 </span>
               ) : (
                 <>
@@ -162,7 +171,7 @@ export const AudioPlayer: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Playback Controls & Progress Bar */}
+        {/* Playback Controls & Progress Bar */}
         <div className="flex flex-col items-center justify-center max-w-xl w-full px-4">
           <div className="flex items-center gap-5 mb-1.5">
             {/* Repeat Mode */}
@@ -171,10 +180,10 @@ export const AudioPlayer: React.FC = () => {
                 onClick={cycleRepeatMode}
                 title={
                   repeatMode === 'off'
-                    ? 'التكرار متوقف'
+                    ? t('audioPlayer.repeatOff')
                     : repeatMode === 'one'
-                    ? 'تكرار السورة الحالية'
-                    : 'تكرار القائمة بالكامل'
+                    ? t('audioPlayer.repeatOne')
+                    : t('audioPlayer.repeatAll')
                 }
                 className={`p-2 rounded-xl text-xs transition-colors ${
                   repeatMode !== 'off'
@@ -188,10 +197,10 @@ export const AudioPlayer: React.FC = () => {
 
             {/* Previous Track */}
             <button
-              onClick={prevTrack}
+              onClick={isRTL ? prevTrack : nextTrack}
               disabled={isRadio || queue.length === 0}
               className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:hover:text-slate-600 transition-transform active:scale-95"
-              title="السورة السابقة"
+              title={skipForwardTitle}
             >
               <SkipForward className="w-5 h-5" />
             </button>
@@ -201,23 +210,23 @@ export const AudioPlayer: React.FC = () => {
               onClick={togglePlay}
               disabled={isLoading}
               className="w-12 h-12 rounded-full bg-gradient-to-tr from-brand-600 to-emerald-400 text-white flex items-center justify-center shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-105 active:scale-95 transition-all duration-150"
-              title={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
+              title={isPlaying ? t('audioPlayer.pauseSurah') : t('audioPlayer.playSurah')}
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : isPlaying ? (
                 <Pause className="w-5 h-5 fill-white" />
               ) : (
-                <Play className="w-5 h-5 fill-white mr-0.5" />
+                <Play className="w-5 h-5 fill-white rtl:mr-0.5 ltr:ml-0.5" />
               )}
             </button>
 
             {/* Next Track */}
             <button
-              onClick={nextTrack}
+              onClick={isRTL ? nextTrack : prevTrack}
               disabled={isRadio || queue.length === 0}
               className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:hover:text-slate-600 transition-transform active:scale-95"
-              title="السورة التالية"
+              title={skipBackTitle}
             >
               <SkipBack className="w-5 h-5" />
             </button>
@@ -226,7 +235,7 @@ export const AudioPlayer: React.FC = () => {
             {!isRadio && (
               <button
                 onClick={toggleAutoNext}
-                title={autoNext ? 'التشغيل التلقائي مفعل' : 'التشغيل التلقائي معطل'}
+                title={autoNext ? t('audioPlayer.autoNextEnabled') : t('audioPlayer.autoNextDisabled')}
                 className={`text-[11px] font-bold px-2 py-1 rounded-lg border transition-all ${
                   autoNext
                     ? 'border-brand-500/40 bg-brand-500/10 text-brand-600 dark:text-brand-400'
@@ -241,7 +250,7 @@ export const AudioPlayer: React.FC = () => {
           {/* Progress Timeline */}
           {!isRadio ? (
             <div className="w-full flex items-center gap-3">
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono w-10 text-left">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono w-10 text-start">
                 {formatTime(progress)}
               </span>
               <input
@@ -252,19 +261,19 @@ export const AudioPlayer: React.FC = () => {
                 onChange={(e) => seek(Number(e.target.value))}
                 className="w-full"
               />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono w-10 text-right">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono w-10 text-end">
                 {formatTime(duration)}
               </span>
             </div>
           ) : (
             <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>البث الصوتي المباشر مستمر</span>
+              <span>{t('common.liveAudioBroadcast')}</span>
             </div>
           )}
         </div>
 
-        {/* Right: Volume, Speed & Queue Drawer Toggle */}
+        {/* Volume, Speed & Queue Drawer Toggle */}
         <div className="flex items-center justify-end gap-3 w-1/4 min-w-[240px]">
           {/* Playback Speed dropdown */}
           {!isRadio && (
@@ -272,15 +281,17 @@ export const AudioPlayer: React.FC = () => {
               <button
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
                 className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-all"
-                title="سرعة التلاوة"
+                title={t('audioPlayer.recitationSpeed')}
               >
                 <Gauge className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400" />
                 <span>{playbackRate}x</span>
               </button>
 
               {showSpeedMenu && (
-                <div className="absolute bottom-full mb-2 left-0 w-28 bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl p-1 z-50">
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 px-3 py-1 font-semibold">السرعة</div>
+                <div className="absolute bottom-full mb-2 rtl:left-0 ltr:right-0 w-28 bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl p-1 z-50">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 px-3 py-1 font-semibold">
+                    {t('common.audioSpeed')}
+                  </div>
                   {speedOptions.map((speed) => (
                     <button
                       key={speed}
@@ -288,13 +299,13 @@ export const AudioPlayer: React.FC = () => {
                         setPlaybackRate(speed);
                         setShowSpeedMenu(false);
                       }}
-                      className={`w-full text-right px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                      className={`w-full text-start px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
                         playbackRate === speed
                           ? 'bg-brand-500/15 text-brand-700 dark:text-brand-400 font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
                       }`}
                     >
-                      {speed}x {speed === 1 && '(عادي)'}
+                      {speed}x {speed === 1 && t('common.normalSpeed')}
                     </button>
                   ))}
                 </div>
@@ -307,7 +318,7 @@ export const AudioPlayer: React.FC = () => {
             <button
               onClick={toggleMute}
               className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
-              title={isMuted ? 'إلغاء الكتم' : 'كتم الصوت'}
+              title={isMuted ? t('audioPlayer.unmute') : t('audioPlayer.mute')}
             >
               {isMuted || volume === 0 ? (
                 <VolumeX className="w-4 h-4 text-rose-500" />
@@ -335,7 +346,7 @@ export const AudioPlayer: React.FC = () => {
                   ? 'bg-brand-500/15 text-brand-700 dark:text-brand-400 border-brand-500/30'
                   : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-white/10'
               }`}
-              title="قائمة الانتظار (Queue)"
+              title={t('audioPlayer.queue')}
             >
               <ListMusic className="w-4 h-4" />
             </button>
@@ -345,26 +356,26 @@ export const AudioPlayer: React.FC = () => {
 
       {/* Queue Drawer Overlay */}
       {showQueue && !isRadio && (
-        <div className="absolute bottom-24 left-6 w-96 max-h-[480px] bg-white/95 dark:bg-dark-card/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="absolute bottom-24 rtl:left-6 ltr:right-6 w-96 max-h-[480px] bg-white/95 dark:bg-dark-card/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
           <div className="p-4 border-b border-slate-200/80 dark:border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ListMusic className="w-4 h-4 text-brand-500 dark:text-brand-400" />
               <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-cairo">
-                قائمة التشغيل ({queue.length})
+                {t('audioPlayer.queueTitle', { count: queue.length })}
               </h3>
             </div>
             <button
               onClick={() => setShowQueue(false)}
               className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
             >
-              إغلاق
+              {t('audioPlayer.closeQueue')}
             </button>
           </div>
 
           <div className="overflow-y-auto p-2 space-y-1 divide-y divide-slate-100 dark:divide-white/5">
             {queue.length === 0 ? (
               <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
-                لا توجد سور في قائمة التشغيل
+                {t('audioPlayer.queueEmpty')}
               </div>
             ) : (
               queue.map((item, idx) => {
@@ -388,7 +399,7 @@ export const AudioPlayer: React.FC = () => {
                         queue
                       );
                     }}
-                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-right transition-all group ${
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-start transition-all group ${
                       isCurrent
                         ? 'bg-brand-500/10 dark:bg-brand-500/15 text-brand-700 dark:text-brand-400 border border-brand-500/20 font-bold'
                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
@@ -405,7 +416,9 @@ export const AudioPlayer: React.FC = () => {
                         {item.surahId}
                       </span>
                       <div>
-                        <div className="text-sm font-semibold">سورة {item.surahName}</div>
+                        <div className="text-sm font-semibold">
+                          {t('common.surah')} {item.surahName}
+                        </div>
                         <div className="text-xs text-slate-500 dark:text-slate-400 font-normal">
                           {item.reciterName}
                         </div>
@@ -413,7 +426,7 @@ export const AudioPlayer: React.FC = () => {
                     </div>
 
                     {isCurrent && isPlaying && (
-                      <span className="w-2 h-2 rounded-full bg-brand-500 dark:bg-brand-400 animate-ping mr-2" />
+                      <span className="w-2 h-2 rounded-full bg-brand-500 dark:bg-brand-400 animate-ping rtl:mr-2 ltr:ml-2" />
                     )}
                   </button>
                 );

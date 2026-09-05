@@ -3,6 +3,7 @@ import { Radio as RadioIcon, Play, Pause, Heart, Activity } from 'lucide-react';
 import type { Radio } from '@/shared/types';
 import { usePlayerStore } from '@/renderer/store/usePlayerStore';
 import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
+import { useTranslation } from '@/renderer/i18n';
 
 interface RadioCardProps {
   radio: Radio;
@@ -10,6 +11,7 @@ interface RadioCardProps {
 }
 
 export const RadioCard: React.FC<RadioCardProps> = ({ radio, layout = 'grid' }) => {
+  const { t } = useTranslation();
   const { currentTrack, isPlaying, playRadio, togglePlay } = usePlayerStore();
   const { isFavoriteRadio, toggleFavoriteRadio } = useFavoritesStore();
 
@@ -51,22 +53,22 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio, layout = 'grid' }) 
               {isCurrent && isPlaying && (
                 <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 flex-shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  مباشر
+                  {t('common.live')}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               <Activity className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
-              <span>إذاعة إسلامية</span>
+              <span>{t('common.islamicRadio')}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0 mr-4">
+        <div className="flex items-center gap-2 flex-shrink-0 rtl:mr-4 ltr:ml-4">
           <button
             onClick={() => toggleFavoriteRadio(radio.id)}
             className="p-2.5 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
-            title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+            title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
           >
             <Heart
               className={`w-4 h-4 ${
@@ -82,12 +84,12 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio, layout = 'grid' }) 
                 ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30'
                 : 'bg-slate-100 dark:bg-white/5 hover:bg-brand-500 text-slate-700 dark:text-slate-200 hover:text-white border border-slate-200 dark:border-white/10 hover:border-brand-400'
             }`}
-            title={isCurrent && isPlaying ? 'إيقاف البث' : 'تشغيل البث'}
+            title={isCurrent && isPlaying ? t('radio.pauseStream') : t('radio.playStream')}
           >
             {isCurrent && isPlaying ? (
               <Pause className="w-4 h-4 fill-current" />
             ) : (
-              <Play className="w-4 h-4 fill-current mr-0.5" />
+              <Play className="w-4 h-4 fill-current rtl:mr-0.5 ltr:ml-0.5" />
             )}
           </button>
         </div>
@@ -119,14 +121,14 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio, layout = 'grid' }) 
             {isCurrent && isPlaying && (
               <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                مباشر
+                {t('common.live')}
               </span>
             )}
 
             <button
               onClick={() => toggleFavoriteRadio(radio.id)}
               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"
-              title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+              title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
             >
               <Heart
                 className={`w-4 h-4 ${
@@ -145,7 +147,7 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio, layout = 'grid' }) 
       <div className="pt-3 border-t border-slate-200/80 dark:border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
           <Activity className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
-          <span>إذاعة إسلامية</span>
+          <span>{t('common.islamicRadio')}</span>
         </div>
 
         <button
@@ -155,12 +157,12 @@ export const RadioCard: React.FC<RadioCardProps> = ({ radio, layout = 'grid' }) 
               ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30'
               : 'bg-slate-100 dark:bg-white/5 hover:bg-brand-500 text-slate-700 dark:text-slate-200 hover:text-white border border-slate-200 dark:border-white/10 hover:border-brand-400'
           }`}
-          title={isCurrent && isPlaying ? 'إيقاف البث' : 'تشغيل البث'}
+          title={isCurrent && isPlaying ? t('radio.pauseStream') : t('radio.playStream')}
         >
           {isCurrent && isPlaying ? (
             <Pause className="w-4 h-4 fill-current" />
           ) : (
-            <Play className="w-4 h-4 fill-current mr-0.5" />
+            <Play className="w-4 h-4 fill-current rtl:mr-0.5 ltr:ml-0.5" />
           )}
         </button>
       </div>

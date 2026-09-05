@@ -5,6 +5,7 @@ import { SurahCard } from '@/renderer/components/SurahCard/SurahCard';
 import { ReciterCard } from '@/renderer/components/ReciterCard/ReciterCard';
 import { RadioCard } from '@/renderer/components/RadioCard/RadioCard';
 import { matchesArabic } from '@/renderer/utils/search';
+import { useTranslation } from '@/renderer/i18n';
 
 interface SearchResultsProps {
   query: string;
@@ -29,6 +30,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   onSelectReciter,
   onOpenReciterPicker,
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<SearchTab>('all');
   const [layout, setLayout] = useState<'list' | 'grid'>('list');
 
@@ -47,13 +49,15 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   // Filter reciters
   const matchingReciters = useMemo(() => {
     if (!query.trim()) return [];
-    return reciters.filter((r) => matchesArabic(r.name, query));
+    const trimmed = query.trim().toLowerCase();
+    return reciters.filter((r) => matchesArabic(r.name, query) || r.name.toLowerCase().includes(trimmed));
   }, [reciters, query]);
 
   // Filter radios
   const matchingRadios = useMemo(() => {
     if (!query.trim()) return [];
-    return radios.filter((r) => matchesArabic(r.name, query));
+    const trimmed = query.trim().toLowerCase();
+    return radios.filter((r) => matchesArabic(r.name, query) || r.name.toLowerCase().includes(trimmed));
   }, [radios, query]);
 
   const totalResults = matchingSurahs.length + matchingReciters.length + matchingRadios.length;
@@ -66,11 +70,11 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="flex items-center gap-2">
             <Search className="w-5 h-5 text-brand-600 dark:text-brand-400" />
             <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">
-              نتائج البحث عن: &ldquo;{query}&rdquo;
+              {t('common.searchResultsFor', { query })}
             </h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            عثرنا على <span className="font-bold text-brand-600 dark:text-brand-400">{totalResults}</span> نتيجة مطابقة في السور والقراء والمحطات
+            {t('common.foundResults', { count: totalResults })}
           </p>
         </div>
 
@@ -79,7 +83,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           className="px-4 py-2 rounded-2xl bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 text-xs font-semibold flex items-center gap-2 transition-all shadow-sm dark:shadow-none"
         >
           <X className="w-4 h-4" />
-          <span>إلغاء البحث</span>
+          <span>{t('common.clearSearch')}</span>
         </button>
       </div>
 
@@ -95,7 +99,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
               }`}
             >
-              الكل ({totalResults})
+              {t('common.all')} ({totalResults})
             </button>
 
             {matchingReciters.length > 0 && (
@@ -108,7 +112,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                 }`}
               >
                 <Mic2 className="w-3.5 h-3.5" />
-                <span>القراء ({matchingReciters.length})</span>
+                <span>{t('common.reciters')} ({matchingReciters.length})</span>
               </button>
             )}
 
@@ -122,7 +126,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>السور ({matchingSurahs.length})</span>
+                <span>{t('common.surahs')} ({matchingSurahs.length})</span>
               </button>
             )}
 
@@ -136,7 +140,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                 }`}
               >
                 <RadioIcon className="w-3.5 h-3.5" />
-                <span>الإذاعات ({matchingRadios.length})</span>
+                <span>{t('common.radios')} ({matchingRadios.length})</span>
               </button>
             )}
           </div>
@@ -150,7 +154,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض قائمة"
+              title={t('home.listView')}
             >
               <List className="w-4 h-4" />
             </button>
@@ -161,7 +165,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض شبكي"
+              title={t('home.gridView')}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -177,17 +181,17 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           </div>
           <div className="space-y-1">
             <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200 font-cairo">
-              لم يتم العثور على أي نتائج تطابق &ldquo;{query}&rdquo;
+              {t('common.noResults', { query })}
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-              تأكد من كتابة اسم السورة أو القارئ بشكل صحيح، أو جرب البحث بكلمات أخرى.
+              {t('common.noResultsHint')}
             </p>
           </div>
           <button
             onClick={onClearSearch}
             className="px-5 py-2.5 rounded-xl bg-brand-500 text-white text-xs font-semibold hover:bg-brand-600 shadow-md shadow-brand-500/20 transition-all"
           >
-            العودة للصفحة السابقة
+            {t('common.backToPrevious')}
           </button>
         </div>
       )}
@@ -198,7 +202,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="flex items-center gap-2">
             <Mic2 className="w-5 h-5 text-brand-500 dark:text-brand-400" />
             <h4 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">
-              القراء والمصاحف ({matchingReciters.length})
+              {t('header.titles.reciters')} ({matchingReciters.length})
             </h4>
           </div>
           <div
@@ -226,7 +230,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-brand-500 dark:text-brand-400" />
             <h4 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">
-              سور القرآن الكريم ({matchingSurahs.length})
+              {t('header.titles.surahs')} ({matchingSurahs.length})
             </h4>
           </div>
           <div
@@ -255,7 +259,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <div className="flex items-center gap-2">
             <RadioIcon className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
             <h4 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">
-              إذاعات البث المباشر ({matchingRadios.length})
+              {t('home.liveRadios')} ({matchingRadios.length})
             </h4>
           </div>
           <div

@@ -5,6 +5,7 @@ import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
 import { SurahCard } from '@/renderer/components/SurahCard/SurahCard';
 import { ReciterCard } from '@/renderer/components/ReciterCard/ReciterCard';
 import { RadioCard } from '@/renderer/components/RadioCard/RadioCard';
+import { useTranslation } from '@/renderer/i18n';
 
 interface FavoritesProps {
   surahs: Surah[];
@@ -25,6 +26,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
   onOpenReciterPicker,
   onSelectReciter,
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('surahs');
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const { favoriteSurahIds, favoriteReciterIds, favoriteRadioIds } = useFavoritesStore();
@@ -55,7 +57,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>السور المفضلة ({favoriteSurahs.length})</span>
+            <span>{t('favorites.tabSurahs', { count: favoriteSurahs.length })}</span>
           </button>
 
           <button
@@ -67,7 +69,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
             }`}
           >
             <Mic2 className="w-4 h-4" />
-            <span>القراء المفضلون ({favoriteRecitersList.length})</span>
+            <span>{t('favorites.tabReciters', { count: favoriteRecitersList.length })}</span>
           </button>
 
           <button
@@ -79,7 +81,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
             }`}
           >
             <RadioIcon className="w-4 h-4" />
-            <span>الإذاعات المفضلة ({favoriteRadiosList.length})</span>
+            <span>{t('favorites.tabRadios', { count: favoriteRadiosList.length })}</span>
           </button>
         </div>
 
@@ -91,7 +93,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
                 ? 'bg-brand-500 text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="عرض قائمة"
+            title={t('home.listView')}
           >
             <List className="w-4 h-4" />
           </button>
@@ -102,7 +104,7 @@ export const Favorites: React.FC<FavoritesProps> = ({
                 ? 'bg-brand-500 text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="عرض شبكي"
+            title={t('home.gridView')}
           >
             <LayoutGrid className="w-4 h-4" />
           </button>
@@ -118,10 +120,10 @@ export const Favorites: React.FC<FavoritesProps> = ({
                 <Heart className="w-8 h-8 opacity-40" />
               </div>
               <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
-                لا توجد سور في المفضلة بعد
+                {t('favorites.noFavoriteSurahs')}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                انقر على أيقونة القلب في بطاقة السورة لإضافتها هنا
+                {t('favorites.noFavoriteSurahsHint')}
               </p>
             </div>
           ) : (
@@ -154,10 +156,10 @@ export const Favorites: React.FC<FavoritesProps> = ({
                 <Mic2 className="w-8 h-8 opacity-40" />
               </div>
               <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
-                لا يوجد قراء في المفضلة بعد
+                {t('favorites.noFavoriteReciters')}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                انقر على أيقونة القلب في بطاقة القارئ للوصول السريع إليه
+                {t('favorites.noFavoriteRecitersHint')}
               </p>
             </div>
           ) : (
@@ -189,10 +191,10 @@ export const Favorites: React.FC<FavoritesProps> = ({
                 <RadioIcon className="w-8 h-8 opacity-40" />
               </div>
               <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
-                لا توجد إذاعات في المفضلة بعد
+                {t('favorites.noFavoriteRadios')}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                انقر على أيقونة القلب بجانب الإذاعة لإضافتها للمفضلة
+                {t('favorites.noFavoriteRadiosHint')}
               </p>
             </div>
           ) : (

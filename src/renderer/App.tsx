@@ -18,8 +18,10 @@ import { Favorites } from './pages/Favorites/Favorites';
 import { Settings } from './pages/Settings/Settings';
 import { SearchResults } from './pages/SearchResults/SearchResults';
 import { Skeleton } from './components/Skeleton/Skeleton';
+import { useTranslation } from './i18n';
 
 export const App: React.FC = () => {
+  const { language, dir } = useTranslation();
   const [currentPage, setCurrentPage] = useState<PageId>('home');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -42,7 +44,7 @@ export const App: React.FC = () => {
     initAudioListeners();
   }, [initAudioListeners]);
 
-  // Load API Catalog Data
+  // Load API Catalog Data based on current language
   useEffect(() => {
     let isMounted = true;
 
@@ -50,11 +52,11 @@ export const App: React.FC = () => {
       try {
         setIsLoading(true);
         const [suwarData, recitersData, riwayatData, radiosData, readsData] = await Promise.all([
-          Mp3QuranApi.getSuwar(),
-          Mp3QuranApi.getReciters(),
-          Mp3QuranApi.getRiwayat(),
-          Mp3QuranApi.getRadios(),
-          Mp3QuranApi.getRecentReads(),
+          Mp3QuranApi.getSuwar(language),
+          Mp3QuranApi.getReciters({ language }),
+          Mp3QuranApi.getRiwayat(language),
+          Mp3QuranApi.getRadios(language),
+          Mp3QuranApi.getRecentReads(language),
         ]);
 
         if (isMounted) {
@@ -78,7 +80,7 @@ export const App: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [language]);
 
   // Quick play surah using default or first available reciter
   const handlePlaySurahDirect = (surah: Surah) => {
@@ -117,7 +119,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-slate-50 dark:bg-dark-bg text-slate-800 dark:text-slate-100 overflow-hidden font-sans">
+    <div dir={dir} className="flex h-screen w-screen bg-slate-50 dark:bg-dark-bg text-slate-800 dark:text-slate-100 overflow-hidden font-sans">
       {/* 1. Permanent Sidebar */}
       <Sidebar
         currentPage={currentPage}

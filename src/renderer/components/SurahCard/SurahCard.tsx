@@ -3,6 +3,7 @@ import { Play, Pause, Heart, User } from 'lucide-react';
 import type { Surah } from '@/shared/types';
 import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
 import { usePlayerStore } from '@/renderer/store/usePlayerStore';
+import { useTranslation } from '@/renderer/i18n';
 
 interface SurahCardProps {
   surah: Surah;
@@ -17,6 +18,7 @@ export const SurahCard: React.FC<SurahCardProps> = ({
   onOpenReciterPicker,
   layout = 'grid',
 }) => {
+  const { t, isRTL } = useTranslation();
   const { isFavoriteSurah, toggleFavoriteSurah } = useFavoritesStore();
   const { currentTrack, isPlaying, togglePlay } = usePlayerStore();
 
@@ -25,6 +27,8 @@ export const SurahCard: React.FC<SurahCardProps> = ({
     currentTrack?.type === 'surah' && currentTrack.surahId === surah.id;
 
   const isMakki = surah.makkia === 1;
+  const displayName = isRTL ? surah.name : (surah.name_en || (surah as any).englishName || surah.name);
+  const secondaryName = isRTL ? (surah.name_en || (surah as any).englishName || '') : surah.name;
 
   if (layout === 'list') {
     return (
@@ -46,7 +50,7 @@ export const SurahCard: React.FC<SurahCardProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-base text-slate-800 dark:text-slate-100 font-cairo">
-                سورة {surah.name}
+                {t('common.surah')} {displayName}
               </h3>
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
@@ -55,15 +59,15 @@ export const SurahCard: React.FC<SurahCardProps> = ({
                     : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                 }`}
               >
-                {isMakki ? 'مكية' : 'مدنية'}
+                {isMakki ? t('common.makki') : t('common.madani')}
               </span>
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
-              <span>{surah.ayah_count || '—'} آية</span>
+              <span>{surah.ayah_count || '—'} {t('common.ayah')}</span>
               {surah.start_page && (
                 <>
                   <span>•</span>
-                  <span>صفحة {surah.start_page}</span>
+                  <span>{t('common.page')} {surah.start_page}</span>
                 </>
               )}
             </div>
@@ -75,17 +79,17 @@ export const SurahCard: React.FC<SurahCardProps> = ({
             <button
               onClick={() => onOpenReciterPicker(surah)}
               className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 text-xs font-semibold flex items-center gap-1.5 transition-all"
-              title="اختيار القارئ"
+              title={t('common.chooseReciterAndMoshaf')}
             >
               <User className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400" />
-              <span>القارئ</span>
+              <span>{t('common.chooseReciter')}</span>
             </button>
           )}
 
           <button
             onClick={() => toggleFavoriteSurah(surah.id)}
             className="p-2.5 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
-            title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+            title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
           >
             <Heart
               className={`w-4 h-4 ${
@@ -107,11 +111,12 @@ export const SurahCard: React.FC<SurahCardProps> = ({
                 ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/30'
                 : 'bg-slate-100 dark:bg-white/5 hover:bg-brand-500 text-slate-700 dark:text-slate-200 hover:text-white border border-slate-200 dark:border-white/10 hover:border-brand-400'
             }`}
+            title={isCurrentSurah && isPlaying ? t('common.pause') : t('common.play')}
           >
             {isCurrentSurah && isPlaying ? (
               <Pause className="w-4 h-4 fill-current" />
             ) : (
-              <Play className="w-4 h-4 fill-current mr-0.5" />
+              <Play className="w-4 h-4 fill-current rtl:mr-0.5 ltr:ml-0.5" />
             )}
           </button>
         </div>
@@ -149,13 +154,13 @@ export const SurahCard: React.FC<SurahCardProps> = ({
                   : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
               }`}
             >
-              {isMakki ? 'مكية' : 'مدنية'}
+              {isMakki ? t('common.makki') : t('common.madani')}
             </span>
 
             <button
               onClick={() => toggleFavoriteSurah(surah.id)}
               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"
-              title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+              title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
             >
               <Heart
                 className={`w-4 h-4 ${
@@ -167,22 +172,24 @@ export const SurahCard: React.FC<SurahCardProps> = ({
         </div>
 
         {/* Surah Name & Transliteration */}
-        <div className="mb-4 text-right">
+        <div className="mb-4 text-start">
           <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-amiri group-hover:text-brand-600 dark:group-hover:text-emerald-400 transition-colors">
-            سورة {surah.name}
+            {t('common.surah')} {displayName}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5">
-            {surah.name_en || (surah as any).englishName || ''}
-          </p>
+          {secondaryName && (
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5">
+              {secondaryName}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Card Footer: Metadata & Play Controls */}
       <div className="pt-3 border-t border-slate-200/80 dark:border-white/5 flex items-center justify-between">
         <div className="text-[11px] text-slate-500 dark:text-slate-400">
-          <div>{surah.ayah_count || '—'} آية</div>
+          <div>{surah.ayah_count || '—'} {t('common.ayah')}</div>
           {surah.start_page && (
-            <div className="text-[10px] text-slate-400 dark:text-slate-500">صفحة {surah.start_page}</div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500">{t('common.page')} {surah.start_page}</div>
           )}
         </div>
 
@@ -191,7 +198,7 @@ export const SurahCard: React.FC<SurahCardProps> = ({
             <button
               onClick={() => onOpenReciterPicker(surah)}
               className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 transition-colors"
-              title="اختيار القارئ والمصحف"
+              title={t('common.chooseReciterAndMoshaf')}
             >
               <User className="w-3.5 h-3.5" />
             </button>
@@ -210,12 +217,12 @@ export const SurahCard: React.FC<SurahCardProps> = ({
                 ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30'
                 : 'bg-slate-100 dark:bg-white/5 hover:bg-brand-500 text-slate-700 dark:text-slate-200 hover:text-white border border-slate-200 dark:border-white/10 hover:border-brand-400'
             }`}
-            title={isCurrentSurah && isPlaying ? 'إيقاف مؤقت' : 'تشغيل السورة'}
+            title={isCurrentSurah && isPlaying ? t('common.pause') : t('common.play')}
           >
             {isCurrentSurah && isPlaying ? (
               <Pause className="w-4 h-4 fill-current" />
             ) : (
-              <Play className="w-4 h-4 fill-current mr-0.5" />
+              <Play className="w-4 h-4 fill-current rtl:mr-0.5 ltr:ml-0.5" />
             )}
           </button>
         </div>

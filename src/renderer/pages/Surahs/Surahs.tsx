@@ -3,6 +3,7 @@ import { LayoutGrid, List, Sparkles, Filter } from 'lucide-react';
 import type { Surah } from '@/shared/types';
 import { SurahCard } from '@/renderer/components/SurahCard/SurahCard';
 import { matchesArabic } from '@/renderer/utils/search';
+import { useTranslation } from '@/renderer/i18n';
 
 interface SurahsProps {
   surahs: Surah[];
@@ -17,6 +18,7 @@ export const Surahs: React.FC<SurahsProps> = ({
   onPlayDirect,
   onOpenReciterPicker,
 }) => {
+  const { t } = useTranslation();
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const [typeFilter, setTypeFilter] = useState<'all' | 'makki' | 'madani'>('all');
 
@@ -44,7 +46,7 @@ export const Surahs: React.FC<SurahsProps> = ({
       {/* Filters & Layout Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl glass-panel">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-brand-500 dark:text-brand-400 mr-1" />
+          <Filter className="w-4 h-4 text-brand-500 dark:text-brand-400 rtl:mr-1 ltr:ml-1" />
           <button
             onClick={() => setTypeFilter('all')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
@@ -53,7 +55,7 @@ export const Surahs: React.FC<SurahsProps> = ({
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            الكل (114)
+            {t('surahs.filterAll')}
           </button>
           <button
             onClick={() => setTypeFilter('makki')}
@@ -63,7 +65,7 @@ export const Surahs: React.FC<SurahsProps> = ({
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            مكية (86)
+            {t('surahs.filterMakki')}
           </button>
           <button
             onClick={() => setTypeFilter('madani')}
@@ -73,7 +75,7 @@ export const Surahs: React.FC<SurahsProps> = ({
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            مدنية (28)
+            {t('surahs.filterMadani')}
           </button>
         </div>
 
@@ -86,7 +88,7 @@ export const Surahs: React.FC<SurahsProps> = ({
                 ? 'bg-brand-500 text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="عرض شبكي"
+            title={t('home.gridView')}
           >
             <LayoutGrid className="w-4 h-4" />
           </button>
@@ -97,7 +99,7 @@ export const Surahs: React.FC<SurahsProps> = ({
                 ? 'bg-brand-500 text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="عرض قائمة"
+            title={t('home.listView')}
           >
             <List className="w-4 h-4" />
           </button>
@@ -111,10 +113,10 @@ export const Surahs: React.FC<SurahsProps> = ({
             <Sparkles className="w-8 h-8 opacity-40" />
           </div>
           <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
-            لم يتم العثور على أي سورة
+            {t('surahs.noSurahsFound')}
           </h4>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            تأكد من كتابة اسم السورة أو رقمها بشكل صحيح
+            {t('surahs.noSurahsFoundHint')}
           </p>
         </div>
       ) : (

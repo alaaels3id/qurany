@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sun, Moon, Maximize2, Minimize2 } from 'lucide-react';
 import { useSettingsStore } from '@/renderer/store/useSettingsStore';
+import { useTranslation } from '@/renderer/i18n';
 import type { PageId } from '../Sidebar/Sidebar';
 
 interface HeaderProps {
@@ -15,6 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
 }) => {
   const { theme, setTheme } = useSettingsStore();
+  const { t } = useTranslation();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -26,15 +28,6 @@ export const Header: React.FC<HeaderProps> = ({
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
-
-  const titles: Record<PageId, { title: string; desc: string }> = {
-    home: { title: 'الرئيسية', desc: 'مرحباً بك في تطبيق قرآني لسطح المكتب' },
-    surahs: { title: 'سور القرآن الكريم', desc: '114 سورة مرتلة بأصوات كبار القراء' },
-    reciters: { title: 'القراء والمصاحف', desc: 'تصفح قائمة القراء والروايات والمصاحف الكاملة' },
-    radio: { title: 'الإذاعات الإسلامية', desc: 'بث مباشر لإذاعات القرآن والتفاسير' },
-    favorites: { title: 'المفضلة', desc: 'السور والقراء والمحطات المفضلة لديك' },
-    settings: { title: 'الإعدادات', desc: 'تخصيص المظهر وتفضيلات التشغيل والنظام' },
-  };
 
   const handleToggleTheme = () => {
     if (theme === 'dark') setTheme('light');
@@ -65,30 +58,30 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Title & Subtitle */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-cairo flex items-center gap-2">
-          {searchQuery.trim() ? 'نتائج البحث' : titles[currentPage].title}
+          {searchQuery.trim() ? t('common.searchResults') : t(`header.titles.${currentPage}`)}
         </h2>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
           {searchQuery.trim()
-            ? 'البحث الشامل في السور والقراء والمحطات الإذاعية'
-            : titles[currentPage].desc}
+            ? t('header.descriptions.searchResults')
+            : t(`header.descriptions.${currentPage}`)}
         </p>
       </div>
 
       {/* Center Search Bar */}
       {currentPage !== 'settings' && (
         <div className="relative w-80 max-w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute rtl:right-3.5 ltr:left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="بحث عن سورة، قارئ، أو إذاعة..."
-            className="w-full pl-4 pr-10 py-2 rounded-xl bg-slate-100/90 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500/60 focus:bg-white dark:focus:bg-white/10 transition-all shadow-inner dark:shadow-none"
+            placeholder={t('common.searchPlaceholder')}
+            className="w-full rtl:pl-4 rtl:pr-10 ltr:pr-4 ltr:pl-10 py-2 rounded-xl bg-slate-100/90 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500/60 focus:bg-white dark:focus:bg-white/10 transition-all shadow-inner dark:shadow-none"
           />
           {searchQuery && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700 dark:hover:text-white px-1"
+              className="absolute rtl:left-3 ltr:right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700 dark:hover:text-white px-1"
             >
               ✕
             </button>
@@ -101,7 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Theme Toggle Button */}
         <button
           onClick={handleToggleTheme}
-          title="تبديل المظهر"
+          title={t('header.toggleTheme')}
           className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all"
         >
           {theme === 'dark' ? (
@@ -114,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Fullscreen Toggle Button */}
         <button
           onClick={handleToggleFullscreen}
-          title={isFullscreen ? 'إنهاء ملء الشاشة' : 'ملء الشاشة'}
+          title={isFullscreen ? t('header.exitFullscreen') : t('header.toggleFullscreen')}
           className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all"
         >
           {isFullscreen ? (

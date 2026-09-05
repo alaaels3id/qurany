@@ -8,6 +8,7 @@ import {
   Heart,
   Settings,
 } from 'lucide-react';
+import { useTranslation } from '@/renderer/i18n';
 
 export type PageId = 'home' | 'surahs' | 'reciters' | 'radio' | 'favorites' | 'settings';
 
@@ -17,6 +18,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) => {
+  const { t } = useTranslation();
   const [logoError, setLogoError] = useState(false);
   const [isOnline, setIsOnline] = useState<boolean>(
     typeof navigator !== 'undefined' ? navigator.onLine : true
@@ -57,17 +59,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) =
       clearInterval(interval);
     };
   }, []);
+
   const navItems = [
-    { id: 'home' as PageId, label: 'الرئيسية', icon: Home },
-    { id: 'surahs' as PageId, label: 'السور', icon: BookOpen },
-    { id: 'reciters' as PageId, label: 'القراء', icon: Mic2 },
-    { id: 'radio' as PageId, label: 'الراديو والبث', icon: RadioIcon },
-    { id: 'favorites' as PageId, label: 'المفضلة', icon: Heart },
-    { id: 'settings' as PageId, label: 'الإعدادات', icon: Settings },
+    { id: 'home' as PageId, label: t('common.home'), icon: Home },
+    { id: 'surahs' as PageId, label: t('common.surahs'), icon: BookOpen },
+    { id: 'reciters' as PageId, label: t('common.reciters'), icon: Mic2 },
+    { id: 'radio' as PageId, label: t('common.radios'), icon: RadioIcon },
+    { id: 'favorites' as PageId, label: t('common.favorites'), icon: Heart },
+    { id: 'settings' as PageId, label: t('common.settings'), icon: Settings },
   ];
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-white dark:bg-dark-sidebar border-l border-slate-200/80 dark:border-white/5 flex flex-col h-full select-none z-20">
+    <aside className="w-64 flex-shrink-0 bg-white dark:bg-dark-sidebar rtl:border-l ltr:border-r border-slate-200/80 dark:border-white/5 flex flex-col h-full select-none z-20">
       {/* Brand Header */}
       <div className="p-6 flex items-center gap-3 border-b border-slate-200/80 dark:border-white/5">
         <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-brand-500/15 border border-brand-500/30 flex-shrink-0 bg-emerald-50 dark:bg-dark-card flex items-center justify-center relative">
@@ -84,19 +87,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) =
         </div>
         <div>
           <h1 className="font-bold text-lg text-slate-800 dark:text-slate-100 tracking-wide flex items-center gap-1.5 font-cairo">
-            قرآني
+            {t('common.appTitle')}
             <span className="text-[9px] font-semibold tracking-wide px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20 font-sans">
-              Free
+              {t('common.free')}
             </span>
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">تلاوات القرآن الكريم</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('common.appSubtitle')}</p>
         </div>
       </div>
 
       {/* Navigation Links */}
       <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
         <div className="px-3 pb-2 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-          التصفح والاستماع
+          {t('common.browseAndListen')}
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -116,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) =
               />
               <span className="truncate">{item.label}</span>
               {isActive && (
-                <div className="mr-auto w-1.5 h-1.5 rounded-full bg-brand-500 dark:bg-brand-400 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                <div className="ms-auto w-1.5 h-1.5 rounded-full bg-brand-500 dark:bg-brand-400 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
               )}
             </button>
           );
@@ -147,13 +150,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) =
               : 'text-rose-600 dark:text-rose-400'
               }`}
           >
-            {isOnline ? 'متصل بـ MP3Quran' : 'غير متصل بالإنترنت'}
+            {isOnline ? t('common.onlineWithMp3Quran') : t('common.offline')}
           </span>
         </div>
         <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
           {isOnline
-            ? 'أكثر من 200 قارئ، ومئات المصاحف والإذاعات المباشرة.'
-            : 'يرجى التحقق من اتصالك بالإنترنت للاستماع للتلاوات.'}
+            ? t('common.onlineDesc')
+            : t('common.offlineDesc')}
         </p>
       </div>
     </aside>

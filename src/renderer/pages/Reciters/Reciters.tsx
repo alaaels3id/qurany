@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Mic2, Filter, List, LayoutGrid } from 'lucide-react';
 import type { Reciter, Riwayah } from '@/shared/types';
 import { ReciterCard } from '@/renderer/components/ReciterCard/ReciterCard';
 import { matchesArabic } from '@/renderer/utils/search';
+import { useTranslation } from '@/renderer/i18n';
 
 interface RecitersProps {
   reciters: Reciter[];
@@ -15,24 +16,37 @@ const ARABIC_LETTERS = [
   'الكل', 'أ', 'إ', 'ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
 ];
 
+const ENGLISH_LETTERS = [
+  'All', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+];
+
 export const Reciters: React.FC<RecitersProps> = ({
   reciters,
   riwayat,
   searchQuery,
   onSelectReciter,
 }) => {
-  const [selectedLetter, setSelectedLetter] = useState<string>('الكل');
+  const { t, isRTL } = useTranslation();
+  const letters = isRTL ? ARABIC_LETTERS : ENGLISH_LETTERS;
+  const allLetterValue = isRTL ? 'الكل' : 'All';
+
+  const [selectedLetter, setSelectedLetter] = useState<string>(allLetterValue);
   const [selectedRiwayah, setSelectedRiwayah] = useState<number | 'all'>('all');
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
+
+  // Reset selected letter when switching languages
+  useEffect(() => {
+    setSelectedLetter(allLetterValue);
+  }, [allLetterValue]);
 
   const filteredReciters = useMemo(() => {
     return reciters.filter((r) => {
       // Letter filter
-      if (selectedLetter !== 'الكل') {
-        const firstLetter = r.name.trim()[0];
+      if (selectedLetter !== 'الكل' && selectedLetter !== 'All') {
+        const firstLetter = r.name.trim()[0]?.toUpperCase();
         if (selectedLetter === 'أ' || selectedLetter === 'إ' || selectedLetter === 'ا') {
           if (!['أ', 'إ', 'ا', 'آ'].includes(firstLetter)) return false;
-        } else if (firstLetter !== selectedLetter) {
+        } else if (firstLetter !== selectedLetter.toUpperCase()) {
           return false;
         }
       }
@@ -45,7 +59,10 @@ export const Reciters: React.FC<RecitersProps> = ({
 
       // Search Query
       if (searchQuery.trim()) {
-        if (!matchesArabic(r.name, searchQuery)) return false;
+        const query = searchQuery.trim().toLowerCase();
+        const matchAr = matchesArabic(r.name, searchQuery);
+        const matchEn = r.name.toLowerCase().includes(query);
+        if (!matchAr && !matchEn) return false;
       }
 
       return true;
@@ -54,9 +71,9 @@ export const Reciters: React.FC<RecitersProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 select-none">
-      {/* Arabic Alphabet Bar */}
+      {/* Alphabet Bar */}
       <div className="flex items-center gap-1.5 overflow-x-auto p-3 rounded-2xl glass-panel pb-3">
-        {ARABIC_LETTERS.map((letter) => (
+        {letters.map((letter) => (
           <button
             key={letter}
             onClick={() => setSelectedLetter(letter)}
@@ -76,7 +93,7 @@ export const Reciters: React.FC<RecitersProps> = ({
         <div className="flex items-center gap-3">
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <Filter className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400" />
-            <span>الرواية / المصحف:</span>
+            <span>{t('reciters.riwayahOrMoshaf')}</span>
           </span>
 
           <select
@@ -87,7 +104,7 @@ export const Reciters: React.FC<RecitersProps> = ({
             className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-brand-500/50 shadow-sm dark:shadow-none"
           >
             <option value="all" className="bg-white dark:bg-dark-card text-slate-800 dark:text-white">
-              جميع الروايات
+              {t('reciters.allRiwayat')}
             </option>
             {riwayat.map((rw) => (
               <option key={rw.id} value={rw.id} className="bg-white dark:bg-dark-card text-slate-800 dark:text-white">
@@ -99,7 +116,8 @@ export const Reciters: React.FC<RecitersProps> = ({
 
         <div className="flex items-center gap-4">
           <div className="text-xs text-slate-500 dark:text-slate-400">
-            عدد القراء: <span className="text-brand-600 dark:text-brand-400 font-bold">{filteredReciters.length}</span>
+            {t('reciters.recitersCount')}{' '}
+            <span className="text-brand-600 dark:text-brand-400 font-bold">{filteredReciters.length}</span>
           </div>
 
           <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 flex-shrink-0">
@@ -110,7 +128,7 @@ export const Reciters: React.FC<RecitersProps> = ({
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض قائمة"
+              title={t('home.listView')}
             >
               <List className="w-4 h-4" />
             </button>
@@ -121,7 +139,7 @@ export const Reciters: React.FC<RecitersProps> = ({
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض شبكي"
+              title={t('home.gridView')}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -136,9 +154,11 @@ export const Reciters: React.FC<RecitersProps> = ({
             <Mic2 className="w-8 h-8 opacity-40" />
           </div>
           <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
-            لم يتم العثور على أي قارئ
+            {t('reciters.noRecitersFound')}
           </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400">جرب البحث بكلمات أخرى أو اختر حرفاً مختلفاً</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {t('reciters.noRecitersFoundHint')}
+          </p>
         </div>
       ) : (
         <div

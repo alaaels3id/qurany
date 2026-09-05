@@ -109,6 +109,7 @@ export interface PlayerState {
 export type ThemeMode = 'dark' | 'light' | 'system';
 
 export interface AppSettings {
+  language: 'ar' | 'en';
   theme: ThemeMode;
   defaultReciterId: number;
   defaultMoshafId: number;

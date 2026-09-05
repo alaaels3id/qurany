@@ -3,6 +3,7 @@ import { Radio as RadioIcon, List, LayoutGrid } from 'lucide-react';
 import type { Radio } from '@/shared/types';
 import { RadioCard } from '@/renderer/components/RadioCard/RadioCard';
 import { matchesArabic } from '@/renderer/utils/search';
+import { useTranslation } from '@/renderer/i18n';
 
 interface RadioPageProps {
   radios: Radio[];
@@ -10,11 +11,13 @@ interface RadioPageProps {
 }
 
 export const RadioPage: React.FC<RadioPageProps> = ({ radios, searchQuery }) => {
+  const { t } = useTranslation();
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
 
   const filteredRadios = useMemo(() => {
     if (!searchQuery.trim()) return radios;
-    return radios.filter((r) => matchesArabic(r.name, searchQuery));
+    const q = searchQuery.trim().toLowerCase();
+    return radios.filter((r) => matchesArabic(r.name, searchQuery) || r.name.toLowerCase().includes(q));
   }, [radios, searchQuery]);
 
   return (
@@ -25,17 +28,18 @@ export const RadioPage: React.FC<RadioPageProps> = ({ radios, searchQuery }) => 
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 font-cairo">
-              محطات الإذاعة الإسلامية المباشرة
+              {t('radio.bannerTitle')}
             </h3>
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            بث صوتي حي متواصل لتلاوات القرآن الكريم على مدار 24 ساعة
+            {t('radio.bannerDesc')}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-white/5 px-4 py-2 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
-            المحطات المتاحة: <span className="text-brand-600 dark:text-brand-400 font-bold">{filteredRadios.length}</span>
+            {t('radio.availableStations')}{' '}
+            <span className="text-brand-600 dark:text-brand-400 font-bold">{filteredRadios.length}</span>
           </div>
 
           <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/10 flex-shrink-0">
@@ -46,7 +50,7 @@ export const RadioPage: React.FC<RadioPageProps> = ({ radios, searchQuery }) => 
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض قائمة"
+              title={t('home.listView')}
             >
               <List className="w-4 h-4" />
             </button>
@@ -57,7 +61,7 @@ export const RadioPage: React.FC<RadioPageProps> = ({ radios, searchQuery }) => 
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض شبكي"
+              title={t('home.gridView')}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -72,9 +76,11 @@ export const RadioPage: React.FC<RadioPageProps> = ({ radios, searchQuery }) => 
             <RadioIcon className="w-8 h-8 opacity-40" />
           </div>
           <h4 className="text-base font-bold text-slate-800 dark:text-slate-300 font-cairo">
-            لم يتم العثور على أي إذاعة
+            {t('radio.noRadiosFound')}
           </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400">تأكد من كتابة اسم الإذاعة بشكل صحيح</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {t('radio.noRadiosFoundHint')}
+          </p>
         </div>
       ) : (
         <div

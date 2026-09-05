@@ -5,6 +5,7 @@ import { QURAN_SURAHS } from '@/shared/constants/quran';
 import { AudioUrlBuilder } from '@/renderer/services/mp3quran/urlBuilder';
 import { usePlayerStore } from '@/renderer/store/usePlayerStore';
 import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
+import { useTranslation } from '@/renderer/i18n';
 
 interface MoshafModalProps {
   reciter: Reciter | null;
@@ -12,6 +13,7 @@ interface MoshafModalProps {
 }
 
 export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) => {
+  const { t, isRTL } = useTranslation();
   const { currentTrack, isPlaying, playTrack, togglePlay } = usePlayerStore();
   const { isFavoriteReciter, toggleFavoriteReciter } = useFavoritesStore();
 
@@ -66,7 +68,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
     const track = {
       type: 'surah' as const,
       surahId: surah.id,
-      surahName: surah.name,
+      surahName: sName(surah),
       reciterId: reciter.id,
       reciterName: reciter.name,
       moshafId: currentMoshaf.id,
@@ -84,6 +86,8 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
     }
   };
 
+  const sName = (s: typeof QURAN_SURAHS[0]) => (isRTL ? s.name : s.englishName);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-200 select-none">
       <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
@@ -96,12 +100,12 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-cairo">
-                  القارئ {reciter.name}
+                  {t('common.reciterTitle', { name: reciter.name })}
                 </h2>
                 <button
                   onClick={() => toggleFavoriteReciter(reciter.id)}
                   className="p-1.5 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
-                  title="المفضلة"
+                  title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
                 >
                   <Heart
                     className={`w-5 h-5 ${
@@ -111,7 +115,10 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                 </button>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                متاح {reciter.moshaf?.length || 1} مصاحف وروايات • {availableSurahIds.length} سورة
+                {t('common.availableMoshafsCount', {
+                  count: reciter.moshaf?.length || 1,
+                  surahsCount: availableSurahIds.length,
+                })}
               </p>
             </div>
           </div>
@@ -122,7 +129,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 text-white font-semibold text-xs flex items-center gap-2 shadow-lg shadow-brand-500/20 hover:scale-105 active:scale-95 transition-all"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>تشغيل الكل</span>
+              <span>{t('common.playAll')}</span>
             </button>
 
             <button
@@ -137,7 +144,9 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
         {/* Moshafs / Riwayat Selector Tabs */}
         {reciter.moshaf && reciter.moshaf.length > 1 && (
           <div className="px-6 py-3 border-b border-slate-200/80 dark:border-white/5 flex items-center gap-2 overflow-x-auto bg-slate-50/80 dark:bg-dark-bg/40">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 pl-2">المصحف / الرواية:</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 rtl:pl-2 ltr:pr-2">
+              {t('common.selectMoshafOrRiwayah')}
+            </span>
             {reciter.moshaf.map((moshaf, idx) => (
               <button
                 key={moshaf.id || idx}
@@ -148,7 +157,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/5'
                 }`}
               >
-                {moshaf.name} ({moshaf.surah_total} سورة)
+                {moshaf.name} ({moshaf.surah_total} {t('common.surah')})
               </button>
             ))}
           </div>
@@ -157,13 +166,13 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
         {/* Search within Reciter's Surahs & Layout Switcher */}
         <div className="p-4 border-b border-slate-200/80 dark:border-white/5 bg-slate-50/40 dark:bg-dark-bg/20 flex items-center gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute rtl:right-3.5 ltr:left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={surahSearch}
               onChange={(e) => setSurahSearch(e.target.value)}
-              placeholder="ابحث في سور هذا المصحف..."
-              className="w-full pl-4 pr-10 py-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500/50"
+              placeholder={t('common.searchInMoshafSurahs')}
+              className="w-full rtl:pl-4 rtl:pr-10 ltr:pr-4 ltr:pl-10 py-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500/50"
             />
           </div>
 
@@ -175,7 +184,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض قائمة"
+              title={t('home.listView')}
             >
               <List className="w-4 h-4" />
             </button>
@@ -186,7 +195,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
-              title="عرض شبكي"
+              title={t('home.gridView')}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -203,7 +212,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
         >
           {filteredSurahs.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 dark:text-slate-400 col-span-full">
-              لم يتم العثور على سورة تطابق البحث
+              {t('common.noSurahFoundInMoshaf')}
             </div>
           ) : (
             filteredSurahs.map((surah) => {
@@ -242,7 +251,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-sm font-amiri text-slate-800 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                          سورة {surah.name}
+                          {t('common.surah')} {sName(surah)}
                         </h4>
                         {layout === 'list' && (
                           <span
@@ -252,14 +261,14 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                                 : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                             }`}
                           >
-                            {surah.makkia === 1 ? 'مكية' : 'مدنية'}
+                            {surah.makkia === 1 ? t('common.makki') : t('common.madani')}
                           </span>
                         )}
                       </div>
                       <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {surah.ayahCount} آية
+                        {surah.ayahCount} {t('common.ayah')}
                         {layout !== 'list' && (
-                          <> • {surah.makkia === 1 ? 'مكية' : 'مدنية'}</>
+                          <> • {surah.makkia === 1 ? t('common.makki') : t('common.madani')}</>
                         )}
                       </span>
                     </div>
@@ -269,7 +278,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                     {layout === 'list' && isCurrent && isPlaying && (
                       <span className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 bg-brand-500/10 px-2.5 py-1 rounded-full border border-brand-500/20">
                         <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
-                        جاري الاستماع
+                        {t('common.listeningNow')}
                       </span>
                     )}
 
@@ -283,7 +292,7 @@ export const MoshafModal: React.FC<MoshafModalProps> = ({ reciter, onClose }) =>
                       {isCurrent && isPlaying ? (
                         <Pause className="w-4 h-4 fill-current" />
                       ) : (
-                        <Play className="w-4 h-4 fill-current mr-0.5" />
+                        <Play className="w-4 h-4 fill-current rtl:mr-0.5 ltr:ml-0.5" />
                       )}
                     </div>
                   </div>

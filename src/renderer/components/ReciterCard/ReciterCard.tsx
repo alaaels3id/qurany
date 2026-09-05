@@ -2,6 +2,7 @@ import React from 'react';
 import { Mic2, BookOpen, Heart, ChevronLeft } from 'lucide-react';
 import type { Reciter } from '@/shared/types';
 import { useFavoritesStore } from '@/renderer/store/useFavoritesStore';
+import { useTranslation } from '@/renderer/i18n';
 
 interface ReciterCardProps {
   reciter: Reciter;
@@ -10,11 +11,14 @@ interface ReciterCardProps {
 }
 
 export const ReciterCard: React.FC<ReciterCardProps> = ({ reciter, layout = 'grid', onSelectReciter }) => {
+  const { t, isRTL } = useTranslation();
   const { isFavoriteReciter, toggleFavoriteReciter } = useFavoritesStore();
   const isFavorite = isFavoriteReciter(reciter.id);
 
   const moshafCount = reciter.moshaf?.length || 0;
-  const moshafNames = reciter.moshaf?.map((m) => m.name).join(' • ') || 'مصحف مرتل';
+  const moshafNames = reciter.moshaf?.map((m) => m.name).join(' • ') || t('common.moshaf');
+
+  const chevronClass = `w-4 h-4 transition-transform ${isRTL ? '' : 'rotate-180'}`;
 
   if (layout === 'list') {
     return (
@@ -36,10 +40,10 @@ export const ReciterCard: React.FC<ReciterCardProps> = ({ reciter, layout = 'gri
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-shrink-0 mr-4">
+        <div className="flex items-center gap-3 flex-shrink-0 rtl:mr-4 ltr:ml-4">
           <span className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 font-medium">
             <BookOpen className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400" />
-            <span>{moshafCount} {moshafCount === 1 ? 'مصحف' : 'مصاحف'}</span>
+            <span>{moshafCount} {moshafCount === 1 ? t('common.moshaf') : t('common.moshafs')}</span>
           </span>
 
           <button
@@ -48,7 +52,7 @@ export const ReciterCard: React.FC<ReciterCardProps> = ({ reciter, layout = 'gri
               toggleFavoriteReciter(reciter.id);
             }}
             className="p-2.5 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
-            title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+            title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
           >
             <Heart
               className={`w-4 h-4 ${
@@ -58,8 +62,8 @@ export const ReciterCard: React.FC<ReciterCardProps> = ({ reciter, layout = 'gri
           </button>
 
           <span className="text-brand-600 dark:text-brand-400 text-xs font-semibold flex items-center gap-1 px-3.5 py-2 rounded-xl bg-brand-500/10 border border-brand-500/20 group-hover:bg-brand-500 group-hover:text-white transition-all">
-            <span>عرض السور</span>
-            <ChevronLeft className="w-4 h-4" />
+            <span>{t('common.viewSurahs')}</span>
+            <ChevronLeft className={chevronClass} />
           </span>
         </div>
       </div>
@@ -83,7 +87,7 @@ export const ReciterCard: React.FC<ReciterCardProps> = ({ reciter, layout = 'gri
               toggleFavoriteReciter(reciter.id);
             }}
             className="p-2 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
-            title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+            title={isFavorite ? t('common.removeFromFavorites') : t('common.addToFavorites')}
           >
             <Heart
               className={`w-4 h-4 ${
@@ -105,12 +109,12 @@ export const ReciterCard: React.FC<ReciterCardProps> = ({ reciter, layout = 'gri
       <div className="pt-3 border-t border-slate-200/80 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
           <BookOpen className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400" />
-          <span>{moshafCount} {moshafCount === 1 ? 'مصحف' : 'مصاحف'}</span>
+          <span>{moshafCount} {moshafCount === 1 ? t('common.moshaf') : t('common.moshafs')}</span>
         </span>
 
-        <span className="text-brand-600 dark:text-brand-400 font-medium flex items-center gap-0.5 group-hover:-translate-x-1 transition-transform">
-          <span>عرض السور</span>
-          <ChevronLeft className="w-4 h-4" />
+        <span className={`text-brand-600 dark:text-brand-400 font-medium flex items-center gap-0.5 transition-transform ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>
+          <span>{t('common.viewSurahs')}</span>
+          <ChevronLeft className={chevronClass} />
         </span>
       </div>
     </div>

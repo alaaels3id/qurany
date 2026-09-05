@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { AppSettings, ThemeMode } from '@/shared/types';
 
 interface SettingsState extends AppSettings {
+  setLanguage: (language: 'ar' | 'en') => void;
   setTheme: (theme: ThemeMode) => void;
   setDefaultReciter: (reciterId: number, moshafId: number) => void;
   setAutoNext: (autoNext: boolean) => void;
@@ -13,6 +14,7 @@ interface SettingsState extends AppSettings {
 const STORAGE_KEY = 'qurany_settings_v1';
 
 const DEFAULT_SETTINGS: AppSettings = {
+  language: 'ar',
   theme: 'dark',
   defaultReciterId: 54, // Mishary Rashid Alafasy
   defaultMoshafId: 1,
@@ -43,8 +45,11 @@ function saveSettings(settings: AppSettings) {
 export const useSettingsStore = create<SettingsState>((set) => {
   const initial = loadSettings();
 
-  // Apply initial theme to documentElement
+  // Apply initial theme and language to documentElement
   if (typeof document !== 'undefined') {
+    document.documentElement.lang = initial.language || 'ar';
+    document.documentElement.dir = initial.language === 'en' ? 'ltr' : 'rtl';
+
     if (initial.theme === 'dark' || (initial.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
@@ -56,6 +61,20 @@ export const useSettingsStore = create<SettingsState>((set) => {
 
   return {
     ...initial,
+
+    setLanguage: (language: 'ar' | 'en') => {
+      set((state) => {
+        const next = { ...state, language };
+        saveSettings(next);
+
+        if (typeof document !== 'undefined') {
+          document.documentElement.lang = language;
+          document.documentElement.dir = language === 'en' ? 'ltr' : 'rtl';
+        }
+
+        return { language };
+      });
+    },
 
     setTheme: (theme: ThemeMode) => {
       set((state) => {
