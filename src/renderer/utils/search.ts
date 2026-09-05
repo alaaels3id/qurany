@@ -6,7 +6,7 @@
 export function normalizeArabic(text: string): string {
   if (!text) return '';
   return text
-    .replace(/[\u064B-\u065F\u0670]/g, '') // remove Arabic diacritics/tashkeel
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, '') // remove Arabic diacritics/tashkeel and tatweel (ـ)
     .replace(/[أإآٱ]/g, 'ا') // unify Alef forms
     .replace(/ة/g, 'ه') // unify Ta Marbuta to Ha
     .replace(/[ىي]/g, 'ي') // unify Alef Maqsura to Yaa
