@@ -23,28 +23,60 @@ let playerState: TrayPlayerState = {
   canGoPrev: false,
 };
 
-function getTrayIcon(): NativeImage {
-  const candidatePaths = [
-    path.join(__dirname, '../../dist/icon.png'),
-    path.join(__dirname, '../../build/icon.png'),
-    path.join(__dirname, '../../public/icon.png'),
-    path.join(process.resourcesPath || '', 'build/icon.png'),
-    path.join(process.resourcesPath || '', 'icon.png'),
-    path.join(app.getAppPath(), 'dist/icon.png'),
-    path.join(app.getAppPath(), 'build/icon.png'),
-    path.join(app.getAppPath(), 'public/icon.png'),
+export type TrayIconStyle = 'book' | 'rihal' | 'open';
+let currentIconStyle: TrayIconStyle = 'book';
+
+function getTrayIcon(style: TrayIconStyle = currentIconStyle): NativeImage {
+  const isMac = process.platform === 'darwin';
+  const prefix = style === 'book' ? 'trayTemplate' : `trayTemplate-${style}`;
+  const candidateNames = [
+    `${prefix}.png`,
+    'trayTemplate.png',
+    'icon.png',
   ];
 
-  for (const iconPath of candidatePaths) {
-    if (fs.existsSync(iconPath)) {
-      const img = nativeImage.createFromPath(iconPath);
-      if (!img.isEmpty()) {
-        return img.resize({ width: 18, height: 18 });
+  const searchDirs = [
+    path.join(__dirname, '../../dist'),
+    path.join(__dirname, '../../public'),
+    path.join(__dirname, '../../build'),
+    path.join(app.getAppPath(), 'dist'),
+    path.join(app.getAppPath(), 'public'),
+    path.join(app.getAppPath(), 'build'),
+    path.join(process.resourcesPath || '', 'dist'),
+    path.join(process.resourcesPath || '', 'build'),
+    process.resourcesPath || '',
+    app.getAppPath(),
+  ];
+
+  for (const name of candidateNames) {
+    for (const dir of searchDirs) {
+      const fullPath = path.join(dir, name);
+      if (fs.existsSync(fullPath)) {
+        const img = nativeImage.createFromPath(fullPath);
+        if (!img.isEmpty()) {
+          if (isMac) {
+            img.setTemplateImage(true);
+          }
+          // Only resize if falling back to the full app icon.png
+          if (name === 'icon.png') {
+            return img.resize({ width: 18, height: 18 });
+          }
+          return img;
+        }
       }
     }
   }
 
   return nativeImage.createEmpty();
+}
+
+export function setTrayIconStyle(mainWindow: BrowserWindow, style: TrayIconStyle) {
+  currentIconStyle = style;
+  if (tray) {
+    const icon = getTrayIcon(style);
+    tray.setImage(icon);
+  }
+  updateTrayMenu(mainWindow);
 }
 
 function toggleWindow(mainWindow: BrowserWindow) {
@@ -244,9 +276,39 @@ export function updateTrayMenu(mainWindow: BrowserWindow) {
         },
       ],
     },
+    // 6. Tray Icon Style Submenu (macOS / System Tray)
+    {
+      label: '🎨 شكل أيقونة الشريط',
+      submenu: [
+        {
+          label: '📖 مصحف شريف (افتراضي)',
+          type: 'radio',
+          checked: currentIconStyle === 'book',
+          click: () => {
+            setTrayIconStyle(mainWindow, 'book');
+          },
+        },
+        {
+          label: '🕋 مصحف على حامل',
+          type: 'radio',
+          checked: currentIconStyle === 'rihal',
+          click: () => {
+            setTrayIconStyle(mainWindow, 'rihal');
+          },
+        },
+        {
+          label: '📖 مصحف مفتوح',
+          type: 'radio',
+          checked: currentIconStyle === 'open',
+          click: () => {
+            setTrayIconStyle(mainWindow, 'open');
+          },
+        },
+      ],
+    },
     { type: 'separator' },
 
-    // 6. Window Controls
+    // 7. Window Controls
     {
       label: mainWindow.isVisible() ? '👁 إخفاء التطبيق' : '👁 إظهار التطبيق',
       click: () => {
